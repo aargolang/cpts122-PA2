@@ -19,7 +19,50 @@ Files:			- main.c
 
 int load(Node **lis)
 {
-	int success = 0;
+	int success = 0, index = 1;
+	FILE *filePointer = NULL;
+	char line[100], copyLine[100];
+	char strBuff[100];
+	Record *rMem = NULL;
+
+	filePointer = fopen("musicPlayList.csv", "r");
+	
+	// start of while loop
+
+	while (fgets(line, 100, filePointer) != NULL) {
+		strcpy(copyLine, line);
+		rMem = (Record*)malloc(sizeof(Record));// record
+		//rMem->artist = (char*)malloc(strlen("me")+1); // artist
+		//strcpy(rMem->artist, "me");
+
+
+		printf("playlist line = %s\n", line);
+		printf("playlist copyLine = %s\n", copyLine);
+
+		if (copyLine[0] == '"') {
+			strcpy(strBuff, strtok(copyLine, "\""));
+		}
+		else {
+			strncpy(strBuff, strtok(copyLine, ','), 50);
+		}
+		rMem->artist = (char*)malloc(strlen(strBuff)+1);
+		strcpy(rMem->artist, strBuff);
+
+		strcpy(strBuff, strtok(NULL, ","));
+		rMem->albumTitle = (char*)malloc(strlen(strBuff) + 1);
+		strcpy(rMem->albumTitle, strBuff);
+
+		strcpy(strBuff, strtok(NULL, ","));
+		rMem->songTitle = (char*)malloc(strlen(strBuff) + 1);
+		strcpy(rMem->songTitle, strBuff);
+
+		strcpy(strBuff, strtok(NULL, ","));
+		rMem->genre = (char*)malloc(strlen(strBuff) + 1);
+		strcpy(rMem->genre, strBuff);
+
+		index++;
+	}
+	// end of while loop
 
 
 
@@ -53,6 +96,8 @@ int main()
 		switch (atoi(userInput)) {
 		case 1:
 			printf("\tloading...\n");
+
+			load(list);
 			break;
 		case 2:
 			printf("(2) store\n");
