@@ -17,57 +17,66 @@ Files:			- main.c
 #include <stdlib.h>
 #include <string.h>
 
-int load(Node **lis)
-{
-	int success = 0, index = 1;
-	FILE *filePointer = NULL;
-	char line[100], copyLine[100];
-	char strBuff[100];
-	Record *rMem = NULL;
-
-	filePointer = fopen("musicPlayList.csv", "r");
-	
-	// start of while loop
-
-	while (fgets(line, 100, filePointer) != NULL) {
-		strcpy(copyLine, line);
-		rMem = (Record*)malloc(sizeof(Record));// record
-		//rMem->artist = (char*)malloc(strlen("me")+1); // artist
-		//strcpy(rMem->artist, "me");
-
-
-		printf("playlist line = %s\n", line);
-		printf("playlist copyLine = %s\n", copyLine);
-
-		if (copyLine[0] == '"') {
-			strcpy(strBuff, strtok(copyLine, "\""));
-		}
-		else {
-			strncpy(strBuff, strtok(copyLine, ','), 50);
-		}
-		rMem->artist = (char*)malloc(strlen(strBuff)+1);
-		strcpy(rMem->artist, strBuff);
-
-		strcpy(strBuff, strtok(NULL, ","));
-		rMem->albumTitle = (char*)malloc(strlen(strBuff) + 1);
-		strcpy(rMem->albumTitle, strBuff);
-
-		strcpy(strBuff, strtok(NULL, ","));
-		rMem->songTitle = (char*)malloc(strlen(strBuff) + 1);
-		strcpy(rMem->songTitle, strBuff);
-
-		strcpy(strBuff, strtok(NULL, ","));
-		rMem->genre = (char*)malloc(strlen(strBuff) + 1);
-		strcpy(rMem->genre, strBuff);
-
-		index++;
-	}
-	// end of while loop
-
-
-
-	return success;
-}
+//int load(Node *lis)
+//{
+//	int success = 0, index = 1;
+//	FILE *filePointer = NULL;
+//	char line[100] = {'\0'}, copyLine[100] = {'\0'};
+//	char strBuff[100];
+//	Record *rMem = NULL;
+//	Duration *dMem = NULL;
+//
+//	filePointer = fopen("musicPlayList.csv", "r");
+//	rMem = (Record*)malloc(sizeof(Record)); // record
+//	dMem = (Duration*)malloc(sizeof(Duration)); // duration
+//
+//	while (fgets(line, 100, filePointer) != NULL) {
+//		strcpy(copyLine, line);
+//
+//		printf("playlist line = %s\n", line);
+//		printf("playlist copyLine = %s\n", copyLine);
+//
+//		if (copyLine[0] == '"') {
+//			strcpy(strBuff, strtok(copyLine, "\""));
+//		}
+//		else {
+//			strncpy(strBuff, strtok(copyLine, ","), 50);
+//		}
+//		rMem->artist = (char*)malloc(strlen(strBuff)+1);
+//		strcpy(rMem->artist, strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		rMem->albumTitle = (char*)malloc(strlen(strBuff) + 1);
+//		strcpy(rMem->albumTitle, strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		rMem->songTitle = (char*)malloc(strlen(strBuff) + 1);
+//		strcpy(rMem->songTitle, strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		rMem->genre = (char*)malloc(strlen(strBuff) + 1);
+//		strcpy(rMem->genre, strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ":"));
+//		dMem->minutes = atoi(strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		dMem->seconds = atoi(strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		rMem->timesPlayed = atoi(strBuff);
+//
+//		strcpy(strBuff, strtok(NULL, ","));
+//		rMem->rating = atoi(strBuff);
+//
+//		rMem->songLength = dMem;
+//
+//		insertFront(lis, rMem);
+//
+//		index++;
+//	}
+//	return success;
+//}
 
 void printMenu(){
 	printf("(1) load\n");
@@ -90,7 +99,8 @@ int main()
 	while (strncmp(userInput,"11",50)!=0)
 	{
 		printMenu();
-		scanf_s("%s", userInput, 50);
+		// scanf_s("%s", userInput, 50);
+		strcpy(userInput, "1");
 		printf("user input = %s\n", userInput); // DEBUG
 		printf("user input atoi = %i\n", atoi(userInput)); // DEBUG
 		switch (atoi(userInput)) {

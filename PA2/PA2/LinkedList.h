@@ -16,14 +16,14 @@ typedef struct record
 	char *albumTitle;
 	char *songTitle;
 	char *genre;
-	Duration songLength;
+	Duration *songLength;
 	int timesPlayed;
 	int rating;
 } Record;
 
 typedef struct node
 {
-	Record data;
+	Record *data;
 	struct node *pNext;
 	struct node *pPrev;
 } Node;
@@ -44,7 +44,7 @@ Function:	insertNode
 input:		pList and node to insert
 output:		1 for successfully allocating space for a node; 0 otherwise
 ************************/
-int insertnode(Node **pList, Record *dat);
+int insertFront(Node **pList, Record *dat);
 
 /***********************
 Function:	deleteNode
@@ -59,5 +59,7 @@ input:		pList to be printed
 output:		(none)
 ************************/
 void printList(Node *Plist);
+
+int load(Node *lis);
 
 #endif
