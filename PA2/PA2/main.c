@@ -17,81 +17,6 @@ Files:			- main.c
 #include <stdlib.h>
 #include <string.h>
 
-//int load(Node *lis)
-//{
-//	int success = 0, index = 1;
-//	FILE *filePointer = NULL;
-//	char line[100] = {'\0'}, copyLine[100] = {'\0'};
-//	char strBuff[100];
-//	Record *rMem = NULL;
-//	Duration *dMem = NULL;
-//
-//	filePointer = fopen("musicPlayList.csv", "r");
-//	rMem = (Record*)malloc(sizeof(Record)); // record
-//	dMem = (Duration*)malloc(sizeof(Duration)); // duration
-//
-//	while (fgets(line, 100, filePointer) != NULL) {
-//		strcpy(copyLine, line);
-//
-//		printf("playlist line = %s\n", line);
-//		printf("playlist copyLine = %s\n", copyLine);
-//
-//		if (copyLine[0] == '"') {
-//			strcpy(strBuff, strtok(copyLine, "\""));
-//		}
-//		else {
-//			strncpy(strBuff, strtok(copyLine, ","), 50);
-//		}
-//		rMem->artist = (char*)malloc(strlen(strBuff)+1);
-//		strcpy(rMem->artist, strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		rMem->albumTitle = (char*)malloc(strlen(strBuff) + 1);
-//		strcpy(rMem->albumTitle, strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		rMem->songTitle = (char*)malloc(strlen(strBuff) + 1);
-//		strcpy(rMem->songTitle, strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		rMem->genre = (char*)malloc(strlen(strBuff) + 1);
-//		strcpy(rMem->genre, strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ":"));
-//		dMem->minutes = atoi(strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		dMem->seconds = atoi(strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		rMem->timesPlayed = atoi(strBuff);
-//
-//		strcpy(strBuff, strtok(NULL, ","));
-//		rMem->rating = atoi(strBuff);
-//
-//		rMem->songLength = dMem;
-//
-//		insertFront(lis, rMem);
-//
-//		index++;
-//	}
-//	return success;
-//}
-
-void printMenu(){
-	printf("(1) load\n");
-	printf("(2) store\n");
-	printf("(3) display\n");
-	printf("(4) insert\n");
-	printf("(5) delete\n");
-	printf("(6) edit\n");
-	printf("(7) sort\n");
-	printf("(8) rate\n");
-	printf("(9) play\n");
-	printf("(10) shuffle\n");
-	printf("(11) exit\n");
-}
-
 int main()
 {
 	Node *list = NULL;
@@ -107,7 +32,7 @@ int main()
 		case 1:
 			printf("\tloading...\n");
 
-			load(list);
+			load(&list);
 			break;
 		case 2:
 			printf("(2) store\n");

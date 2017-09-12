@@ -20,32 +20,59 @@ input:			pList and node to insert
 output:			1 for successfully allocating space for a node; 0 otherwise
 description:	insert node at the (!!!)FRONT(!!!) of the list
 ************************/
-int insertFront(Node **pList, Record *dat)
+int insertFront(Node ***pList, Record *dat)
 {
 	int success = 1;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
 	pMem = makenode(dat);
 
-	if ((*pList) == NULL){ // list is empty
+	if ((**pList) == NULL){ // list is empty
 		if (pMem == NULL){
 			success = 0;
 		}
 		else{
-			(pList) = pMem;
+			(**pList) = pMem;
 		}
 	}
 	else { // if the list is not empty
-		pTemp = (pList);
-		(pList) = pMem;
+		pTemp = (**pList);
+		(**pList) = pMem;
 		pTemp->pPrev = pMem;
 		pMem->pNext = pTemp;
-		pMem->pPrev = (pList);
+		pMem->pPrev = (**pList);
 	}
 	return success;
 }
 
-int load(Node *lis)
+/***********************
+Function:	deleteNode
+input:		pList and record to be deleted
+output:		1 for successfully deleting node; 0 otherwise (node didnt exist)
+************************/
+int deletenode(Node **pList, Node *dat)
+{
+	// TODO: needs to be revised to delete the node passed in
+	Node *pTemp = *pList;
+
+	if (*pList == NULL)
+		return FALSE;
+	else
+	{
+		*pList = pTemp->pNext;
+		pTemp->pPrev = *pList;
+		//free(pTemp->name);
+		free(pTemp);
+		return TRUE;
+	}
+}
+
+/***********************
+Function:	load
+input:		read from file into list
+output:		1 for successfully loading, 0 otherwise
+************************/
+int load(Node **lis)
 {
 	int success = 0, index = 1;
 	FILE *filePointer = NULL;
@@ -99,33 +126,11 @@ int load(Node *lis)
 
 		rMem->songLength = dMem;
 
-		insertFront(lis, rMem);
+		insertFront(&lis, rMem);
 
 		index++;
 	}
 	return success;
-}
-
-/***********************
-Function:	deleteNode
-input:		pList and record to be deleted
-output:		1 for successfully deleting node; 0 otherwise (node didnt exist)
-************************/
-int deletenode(Node **pList, Node *dat)
-{
-	// TODO: needs to be revised to delete the node passed in
-	Node *pTemp = *pList;
-
-	if (*pList == NULL)
-		return FALSE;
-	else
-	{
-		*pList = pTemp->pNext;
-		pTemp->pPrev = *pList;
-		//free(pTemp->name);
-		free(pTemp);
-		return TRUE;
-	}
 }
 
 /***********************
@@ -138,4 +143,23 @@ void printList(Node *dat)
 	// TODO: write thiss
 	printf("TODO: implement printList!\n");
 
+}
+
+/***********************
+Function:	printMenu
+input:		(none)
+output:		(none)
+************************/
+void printMenu() {
+	printf("(1) load\n");
+	printf("(2) store\n");
+	printf("(3) display\n");
+	printf("(4) insert\n");
+	printf("(5) delete\n");
+	printf("(6) edit\n");
+	printf("(7) sort\n");
+	printf("(8) rate\n");
+	printf("(9) play\n");
+	printf("(10) shuffle\n");
+	printf("(11) exit\n");
 }
