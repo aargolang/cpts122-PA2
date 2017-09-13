@@ -31,9 +31,9 @@ typedef enum boolean {
 
 Node *makenode(Record *dat);
 int insertFront(Node ***pList, Record *dat);
-Boolean deletenode(Node **pList, Node *dat);
-int load(Node **lis);
-void printList(Node *Plist);
+Boolean deletenode(Node ***pList, Node *dat);
+int load(Node **pList);
+void printList(Node *pList);
 void printMenu();
 
 #endif

@@ -20,8 +20,7 @@ input:			pList and node to insert
 output:			1 for successfully allocating space for a node; 0 otherwise
 description:	insert node at the (!!!)FRONT(!!!) of the list
 ************************/
-int insertFront(Node ***pList, Record *dat)
-{
+int insertFront(Node ***pList, Record *dat){
 	int success = 1;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
@@ -50,8 +49,7 @@ Function:	deleteNode
 input:		pList and record to be deleted
 output:		1 for successfully deleting node; 0 otherwise (node didnt exist)
 ************************/
-int deletenode(Node **pList, Node *dat)
-{
+int deletenode(Node ***pList, Node *dat){
 	// TODO: needs to be revised to delete the node passed in
 	Node *pTemp = *pList;
 
@@ -72,8 +70,7 @@ Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
-int load(Node **lis)
-{
+int load(Node **pList) {
 	int success = 0, index = 1;
 	FILE *filePointer = NULL;
 	char line[100] = { '\0' }, copyLine[100] = { '\0' };
@@ -126,7 +123,7 @@ int load(Node **lis)
 
 		rMem->songLength = dMem;
 
-		insertFront(&lis, rMem);
+		insertFront(&pList, rMem);
 
 		index++;
 	}
@@ -138,9 +135,21 @@ Function:	printList
 input:		pList to be printed
 output:		(none)
 ************************/
-void printList(Node *dat)
-{
+void printList(Node *pList) {
 	// TODO: write thiss
+	Node *pCur = pList;
+
+	while (pCur->pNext != NULL) {
+		printf("Artist: \t%s\n", pCur->pNext->data->artist);
+		printf("Album: \t%s\n", pCur->pNext->data->albumTitle);
+		printf("Title: \t%s\n", pCur->pNext->data->songTitle);
+		printf("Genre: \t%s\n", pCur->pNext->data->genre);
+		printf("Length: \t%i:", pCur->pNext->data->songLength->minutes);
+		printf("%i\n", pCur->pNext->data->songLength->seconds);
+		printf("Times Played: \t%i\n", pCur->pNext->data->timesPlayed);
+		printf("Rating: \t%i\n", pCur->pNext->data->rating);
+		pCur = pCur->pNext;
+	}
 	printf("TODO: implement printList!\n");
 
 }

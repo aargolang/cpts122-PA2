@@ -24,14 +24,13 @@ int main()
 	while (strncmp(userInput,"11",50)!=0)
 	{
 		printMenu();
-		// scanf_s("%s", userInput, 50);
-		strcpy(userInput, "1");
+		scanf_s("%s", userInput, 50);
+		// strcpy(userInput, "1");
 		printf("user input = %s\n", userInput); // DEBUG
 		printf("user input atoi = %i\n", atoi(userInput)); // DEBUG
 		switch (atoi(userInput)) {
 		case 1:
 			printf("\tloading...\n");
-
 			load(&list);
 			break;
 		case 2:
@@ -39,6 +38,7 @@ int main()
 			break;
 		case 3:
 			printf("(3) display\n");
+			printList(&list);
 			break;
 		case 4:
 			printf("(4) insert\n");
