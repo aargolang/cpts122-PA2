@@ -20,25 +20,29 @@ Files:			- main.c
 int main()
 {
 	Node *list = NULL;
-	char *userInput[50] = { '0' };
-	while (strncmp(userInput,"11",50)!=0)
+	int exit = 0;
+	char userInput[51] = { '0' };
+	char message[51] = { '\0' };
+
+	while (exit != 1)
 	{
+		printf("MSG: %s\n", message);
 		printMenu();
 		scanf_s("%s", userInput, 50);
-		// strcpy(userInput, "1");
-		printf("user input = %s\n", userInput); // DEBUG
-		printf("user input atoi = %i\n", atoi(userInput)); // DEBUG
 		switch (atoi(userInput)) {
 		case 1:
-			printf("\tloading...\n");
+			clrscr();
 			load(&list);
+			strncpy(message, "loaded from file",17);
+			clrscr();
 			break;
 		case 2:
 			printf("(2) store\n");
 			break;
 		case 3:
-			printf("(3) display\n");
+			clrscr();
 			printList(&list);
+			strncpy(message, "\0", 2); 
 			break;
 		case 4:
 			printf("(4) insert\n");
@@ -47,7 +51,9 @@ int main()
 			printf("(5) delete\n");
 			break;
 		case 6:
-			printf("(6) edit\n");
+			clrscr();
+			edit(&list);
+			clrscr();
 			break;
 		case 7:
 			printf("(7) sort\n");
@@ -63,9 +69,11 @@ int main()
 			break;
 		case 11:
 			printf("(11) exit\n");
+			exit = 1;
 			break;
 		default:
 			printf("input not recognized :(\ntry again\n");
+			strncpy(message, "\0", 2);
 		}
 	}
 	

@@ -35,11 +35,15 @@ int insertFront(Node ***pList, Record *dat){
 		}
 	}
 	else { // if the list is not empty
+
 		pTemp = (**pList);
-		(**pList) = pMem;
-		pTemp->pPrev = pMem;
-		pMem->pNext = pTemp;
-		pMem->pPrev = (**pList);
+
+		while (pTemp->pNext != NULL){
+			pTemp = pTemp->pNext;
+		}
+	
+		pTemp->pNext = pMem;
+		pMem->pPrev = pTemp;
 	}
 	return success;
 }
@@ -79,14 +83,13 @@ int load(Node **pList) {
 	Duration *dMem = NULL;
 
 	filePointer = fopen("musicPlayList.csv", "r");
-	rMem = (Record*)malloc(sizeof(Record)); // record
-	dMem = (Duration*)malloc(sizeof(Duration)); // duration
+
 
 	while (fgets(line, 100, filePointer) != NULL) {
 		strcpy(copyLine, line);
 
-		printf("playlist line = %s\n", line);
-		printf("playlist copyLine = %s\n", copyLine);
+		rMem = (Record*)malloc(sizeof(Record)); // record
+		dMem = (Duration*)malloc(sizeof(Duration)); // duration
 
 		if (copyLine[0] == '"') {
 			strcpy(strBuff, strtok(copyLine, "\""));
@@ -127,7 +130,43 @@ int load(Node **pList) {
 
 		index++;
 	}
+
+	rMem = NULL;
+	dMem = NULL;
+
 	return success;
+}
+
+/***********************
+Function:	load
+input:		read from file into list
+output:		1 for successfully loading, 0 otherwise
+************************/
+int edit(Node **pList){
+	int ret = 0;
+	char userInput[51] = { '0' };
+
+	while (ret != 1) {
+		printEditMenu();
+		scanf_s("%s", userInput, 50);
+		switch (atoi(userInput)) {
+		case 1:
+			clrscr();
+			printf("which artist would you like to look up?: ", userInput);
+			scanf_s("%s", userInput, 50);
+			clrscr();
+			break;
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+			ret = 1;
+			break;
+		}
+	}
 }
 
 /***********************
@@ -135,23 +174,20 @@ Function:	printList
 input:		pList to be printed
 output:		(none)
 ************************/
-void printList(Node *pList) {
-	// TODO: write thiss
-	Node *pCur = pList;
+void printList(Node **pList) {
+	Node *pCur = (*pList);
 
 	while (pCur->pNext != NULL) {
-		printf("Artist: \t%s\n", pCur->pNext->data->artist);
-		printf("Album: \t%s\n", pCur->pNext->data->albumTitle);
-		printf("Title: \t%s\n", pCur->pNext->data->songTitle);
-		printf("Genre: \t%s\n", pCur->pNext->data->genre);
+		printf("\nArtist: \t%s\n", pCur->pNext->data->artist);
+		printf("Album: \t\t%s\n", pCur->pNext->data->albumTitle);
+		printf("Title: \t\t%s\n", pCur->pNext->data->songTitle);
+		printf("Genre: \t\t%s\n", pCur->pNext->data->genre);
 		printf("Length: \t%i:", pCur->pNext->data->songLength->minutes);
 		printf("%i\n", pCur->pNext->data->songLength->seconds);
 		printf("Times Played: \t%i\n", pCur->pNext->data->timesPlayed);
-		printf("Rating: \t%i\n", pCur->pNext->data->rating);
+		printf("Rating: \t%i\n\n", pCur->pNext->data->rating);
 		pCur = pCur->pNext;
 	}
-	printf("TODO: implement printList!\n");
-
 }
 
 /***********************
@@ -171,4 +207,26 @@ void printMenu() {
 	printf("(9) play\n");
 	printf("(10) shuffle\n");
 	printf("(11) exit\n");
+}
+
+/***********************
+Function:	printEditMenu
+input:		(none)
+output:		(none)
+************************/
+void printEditMenu() {
+	printf("What attribute would you like to edit?\n");
+	printf("(1) Artist\n");
+	printf("(2) Album title\n");
+	printf("(3) Song title\n");
+	printf("(4) Genre\n");
+	printf("(5) Song length\n");
+	printf("(6) Times played\n");
+	printf("(7) rating\n");
+	printf("(8) return\n");
+}
+
+// clears the screen. nuff said.
+void clrscr(){
+	system("@cls||clear");
 }

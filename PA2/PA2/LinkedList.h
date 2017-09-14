@@ -33,7 +33,10 @@ Node *makenode(Record *dat);
 int insertFront(Node ***pList, Record *dat);
 Boolean deletenode(Node ***pList, Node *dat);
 int load(Node **pList);
-void printList(Node *pList);
+int edit(Node **pList);
+void printList(Node **pList);
 void printMenu();
+void printEditMenu();
+void clrscr();
 
 #endif
