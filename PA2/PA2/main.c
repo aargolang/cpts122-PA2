@@ -22,6 +22,7 @@ int main()
 	List songList;
 	songList.pHead = NULL;
 	songList.pTail = NULL;
+	songList.size = 0;
 	int exit = 0;
 	char userInput[51] = { '0' };
 	char message[51] = { '\0' };

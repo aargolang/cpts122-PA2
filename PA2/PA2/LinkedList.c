@@ -33,6 +33,7 @@ int insertFront(List *pList, Record *dat){
 		else{
 			(pList)->pHead = pMem;
 			(pList)->pTail = pMem;
+			pList->size++;
 		}
 	}
 	else { // if the list is not empty
@@ -45,7 +46,9 @@ int insertFront(List *pList, Record *dat){
 	
 		pTemp->pNext = pMem;
 		pMem->pPrev = pTemp;
+		pList->size++;
 	}
+	
 	return success;
 }
 
@@ -106,7 +109,7 @@ int load(List *pList) {
 		strcpy(rMem->albumTitle, strBuff);
 
 		strcpy(strBuff, strtok(NULL, ","));
-		rMem->songTitle = (char*)malloc(strlen(strBuff) + 1);
+		rMem->songTitle = (char*)malloc((strlen(strBuff) + 1) * sizeof(char));
 		strcpy(rMem->songTitle, strBuff);
 
 		strcpy(strBuff, strtok(NULL, ","));
@@ -168,8 +171,9 @@ Record *getRecord(List *sList, char *song) {
 	Record *rec = NULL;
 	Node *subListHead = sList->pHead;
 
-	while (subListHead->pNext != NULL) {
+	while (subListHead != NULL) {
 		// return the pointer to the record of the name "*song"
+		printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
 		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
 			rec = subListHead->data;
 		}
@@ -179,12 +183,36 @@ Record *getRecord(List *sList, char *song) {
 }
 
 /***********************
+Function:	resetSubList
+input:		sublist
+output:		none
+************************/
+void resetSubList(List *sList) {
+	
+	Node *listHead = sList->pHead;
+	Node *temp;
+
+	while (listHead != NULL) {
+		// free all of the nodes in the sublist, not supposed to free record data
+		listHead->data = NULL;
+		listHead->pPrev = NULL;
+		temp = listHead;
+		listHead = listHead->pNext;
+		free(temp);
+	}
+}
+
+/***********************
 Function:	edit
 input:		changes values in the records
 output:		TRUE if successful
 ************************/
 Boolean edit(List *list){
-	List *subList = NULL;
+	List subList;
+	subList.pHead = NULL;
+	subList.pTail = NULL;
+	subList.size = 0;
+	
 	Record *recordToChange = NULL;
 	Boolean edited = FALSE;
 	Boolean escape = FALSE;
@@ -192,13 +220,14 @@ Boolean edit(List *list){
 	int songCount = 0;
 
 	while (escape == FALSE) {
-		
+		resetSubList(&subList);
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
+			
 			printf("which artist would you like to look up?: (\"exit\" to cancel)");
 			scanf_s("%s", userInput, 50);
 
-			songCount = getArtist(&list, &subList, userInput);
+			songCount = getArtist(list, &subList, userInput);
 
 			if (strncmp(userInput, "exit", 50) == 0) {
 				return edited;
@@ -206,19 +235,30 @@ Boolean edit(List *list){
 			else if (songCount == 0) {
 				printf("Artist not found\n");
 			}
-			else if (songCount > 1) {
-				printList(&subList);
-				printf("which song would you like to edit?: ");
-				scanf_s("%s", userInput, 50);
-				recordToChange = getRecord(&subList, userInput);
+			else if (songCount == 1) {
+				recordToChange = subList.pHead->data;
 			}
 			else {
-				recordToChange = subList->pHead->data;
+				while (recordToChange == NULL){
+					clrscr();
+					printList(&subList);
+					printf("which song would you like to edit?: ");
+					clear();
+					fgets(userInput, 50, stdin);
+					if (userInput[strlen(userInput) - 1] == '\n')
+						userInput[strlen(userInput) - 1] = '\0';
+
+					recordToChange = getRecord(&subList, userInput);
+					if (recordToChange == NULL) {
+						printf("\ninput not recognized");
+					}
+				}
 			}
 		}
 
 		// user edits the song chosen
 		while (recordToChange != NULL) {
+			clrscr();
 			printEditMenu();
 			printf("choose the attribute to change: (\"exit\" when finished)\n");
 			scanf_s("%s", userInput, 50);
@@ -265,17 +305,30 @@ output:		(none)
 void printList(List *list) {
 	Node *pCur = (list)->pHead;
 
-	while (pCur->pNext != NULL) {
-		printf("\nArtist: \t%s\n", pCur->pNext->data->artist);
-		printf("Album: \t\t%s\n", pCur->pNext->data->albumTitle);
-		printf("Title: \t\t%s\n", pCur->pNext->data->songTitle);
-		printf("Genre: \t\t%s\n", pCur->pNext->data->genre);
-		printf("Length: \t%i:", pCur->pNext->data->songLength->minutes);
-		printf("%i\n", pCur->pNext->data->songLength->seconds);
-		printf("Times Played: \t%i\n", pCur->pNext->data->timesPlayed);
-		printf("Rating: \t%i\n\n", pCur->pNext->data->rating);
+	//while (pCur->pNext != NULL) {
+	//	printf("\nArtist: \t%s\n", pCur->pNext->data->artist);
+	//	printf("Album: \t\t%s\n", pCur->pNext->data->albumTitle);
+	//	printf("Title: \t\t%s\n", pCur->pNext->data->songTitle);
+	//	printf("Genre: \t\t%s\n", pCur->pNext->data->genre);
+	//	printf("Length: \t%i:", pCur->pNext->data->songLength->minutes);
+	//	printf("%i\n", pCur->pNext->data->songLength->seconds);
+	//	printf("Times Played: \t%i\n", pCur->pNext->data->timesPlayed);
+	//	printf("Rating: \t%i\n\n", pCur->pNext->data->rating);
+	//	pCur = pCur->pNext;
+	//}
+
+	while (pCur != NULL) {
+		printf("\nArtist: \t%s\n", pCur->data->artist);
+		printf("Album: \t\t%s\n", pCur->data->albumTitle);
+		printf("Title: \t\t%s\n", pCur->data->songTitle);
+		printf("Genre: \t\t%s\n", pCur->data->genre);
+		printf("Length: \t%i:", pCur->data->songLength->minutes);
+		printf("%i\n", pCur->data->songLength->seconds);
+		printf("Times Played: \t%i\n", pCur->data->timesPlayed);
+		printf("Rating: \t%i\n\n", pCur->data->rating);
 		pCur = pCur->pNext;
 	}
+
 }
 
 /***********************
@@ -315,4 +368,9 @@ void printEditMenu() {
 // clears the screen. nuff said.
 void clrscr(){
 	system("@cls||clear");
+}
+
+void clear(void)
+{
+	while (getchar() != '\n');
 }
