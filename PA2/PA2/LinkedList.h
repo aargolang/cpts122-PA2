@@ -35,9 +35,10 @@ typedef struct list {
 } List;
 
 Node *makenode(Record *dat);
-int insertFront(Node ***pList, Record *dat);
+int insertFront(List *pList, Record *dat);
 Boolean deletenode(Node ***pList, Node *dat);
 int load(List *list);
+int searchArtist(List *sList);
 int edit(List *list);
 void printList(List *list);
 void printMenu();

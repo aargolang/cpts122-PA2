@@ -20,23 +20,24 @@ input:			pList and node to insert
 output:			1 for successfully allocating space for a node; 0 otherwise
 description:	insert node at the (!!!)FRONT(!!!) of the list
 ************************/
-int insertFront(Node ***pList, Record *dat){
+int insertFront(List *pList, Record *dat){
 	int success = 1;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
 	pMem = makenode(dat);
 
-	if ((**pList) == NULL){ // list is empty
+	if ((pList)->pHead == NULL){ // list is empty
 		if (pMem == NULL){
 			success = 0;
 		}
 		else{
-			(**pList) = pMem;
+			(pList)->pHead = pMem;
+			(pList)->pTail = pMem;
 		}
 	}
 	else { // if the list is not empty
 
-		pTemp = (**pList);
+		pTemp = (pList)->pHead;
 
 		while (pTemp->pNext != NULL){
 			pTemp = pTemp->pNext;
@@ -74,7 +75,7 @@ Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
-int load(List *list) {
+int load(List *pList) {
 	int success = 0, index = 1;
 	FILE *filePointer = NULL;
 	char line[100] = { '\0' }, copyLine[100] = { '\0' };
@@ -126,7 +127,7 @@ int load(List *list) {
 
 		rMem->songLength = dMem;
 
-		insertFront(list, rMem);
+		insertFront(pList, rMem);
 
 		index++;
 	}
@@ -137,17 +138,30 @@ int load(List *list) {
 	return success;
 }
 
+int searchArtist(List *sList) {
+
+	return 0;
+}
+
 /***********************
 Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
 int edit(List *list){
-	int ret = 0;
+	List *subList = NULL;
+	Record *recordToChange = NULL;
+	Boolean ret = FALSE;
 	char userInput[51] = { '0' };
-	
+	int songNumber = 0;
 
 	printf("which artist would you like to look up?: ", userInput);
+
+	songNumber = searchArtist(&subList);
+
+	if (songNumber > 1) {
+		// ask which song to edit
+	}
 
 
 
@@ -168,7 +182,7 @@ int edit(List *list){
 		case 6:
 		case 7:
 		case 8:
-			ret = 1;
+			ret = TRUE;
 			break;
 		}
 	}
@@ -180,7 +194,7 @@ input:		pList to be printed
 output:		(none)
 ************************/
 void printList(List *list) {
-	Node *pCur = (list);
+	Node *pCur = (list)->pHead;
 
 	while (pCur->pNext != NULL) {
 		printf("\nArtist: \t%s\n", pCur->pNext->data->artist);

@@ -19,13 +19,13 @@ Files:			- main.c
 
 int main()
 {
-	// Node *list = NULL;
 	List songList;
 	songList.pHead = NULL;
 	songList.pTail = NULL;
 	int exit = 0;
 	char userInput[51] = { '0' };
 	char message[51] = { '\0' };
+
 
 	while (exit != 1)
 	{
