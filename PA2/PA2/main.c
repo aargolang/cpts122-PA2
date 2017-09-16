@@ -19,7 +19,10 @@ Files:			- main.c
 
 int main()
 {
-	Node *list = NULL;
+	// Node *list = NULL;
+	List songList;
+	songList.pHead = NULL;
+	songList.pTail = NULL;
 	int exit = 0;
 	char userInput[51] = { '0' };
 	char message[51] = { '\0' };
@@ -32,7 +35,7 @@ int main()
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
-			load(&list);
+			load(&songList);
 			strncpy(message, "loaded from file",17);
 			clrscr();
 			break;
@@ -41,7 +44,7 @@ int main()
 			break;
 		case 3:
 			clrscr();
-			printList(&list);
+			printList(&songList);
 			strncpy(message, "\0", 2); 
 			break;
 		case 4:
@@ -52,7 +55,7 @@ int main()
 			break;
 		case 6:
 			clrscr();
-			edit(&list);
+			edit(&songList);
 			clrscr();
 			break;
 		case 7:

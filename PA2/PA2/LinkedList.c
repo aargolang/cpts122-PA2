@@ -74,7 +74,7 @@ Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
-int load(Node **pList) {
+int load(List *list) {
 	int success = 0, index = 1;
 	FILE *filePointer = NULL;
 	char line[100] = { '\0' }, copyLine[100] = { '\0' };
@@ -126,7 +126,7 @@ int load(Node **pList) {
 
 		rMem->songLength = dMem;
 
-		insertFront(&pList, rMem);
+		insertFront(list, rMem);
 
 		index++;
 	}
@@ -142,9 +142,14 @@ Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
-int edit(Node **pList){
+int edit(List *list){
 	int ret = 0;
 	char userInput[51] = { '0' };
+	
+
+	printf("which artist would you like to look up?: ", userInput);
+
+
 
 	while (ret != 1) {
 		printEditMenu();
@@ -152,7 +157,7 @@ int edit(Node **pList){
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
-			printf("which artist would you like to look up?: ", userInput);
+			
 			scanf_s("%s", userInput, 50);
 			clrscr();
 			break;
@@ -174,8 +179,8 @@ Function:	printList
 input:		pList to be printed
 output:		(none)
 ************************/
-void printList(Node **pList) {
-	Node *pCur = (*pList);
+void printList(List *list) {
+	Node *pCur = (list);
 
 	while (pCur->pNext != NULL) {
 		printf("\nArtist: \t%s\n", pCur->pNext->data->artist);

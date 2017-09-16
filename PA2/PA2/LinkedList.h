@@ -29,12 +29,17 @@ typedef enum boolean {
 	FALSE, TRUE
 } Boolean;
 
+typedef struct list {
+	Node *pHead;
+	Node *pTail;
+} List;
+
 Node *makenode(Record *dat);
 int insertFront(Node ***pList, Record *dat);
 Boolean deletenode(Node ***pList, Node *dat);
-int load(Node **pList);
-int edit(Node **pList);
-void printList(Node **pList);
+int load(List *list);
+int edit(List *list);
+void printList(List *list);
 void printMenu();
 void printEditMenu();
 void clrscr();
