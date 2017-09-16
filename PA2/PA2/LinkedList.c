@@ -138,54 +138,123 @@ int load(List *pList) {
 	return success;
 }
 
-int searchArtist(List *sList) {
+/***********************
+Function:	getArtist
+input:		list, subList, artists name
+output:		number of songs found by the artist
+************************/
+int getArtist(List *pList, List *sList, char *artist) {
+	int count = 0;
+	Node *listHead = pList->pHead;
 
-	return 0;
+	while (listHead->pNext != NULL) {
+		// if the artist if found then copy the pointer to the record into the sublist
+		if (strncmp(listHead->data->artist, artist, 50) == 0) {
+			insertFront(sList, listHead->data);
+			count++;
+		}
+		listHead = listHead->pNext;
+	}
+
+	return count;
 }
 
 /***********************
-Function:	load
-input:		read from file into list
-output:		1 for successfully loading, 0 otherwise
+Function:	getRecord
+input:		sublist, songname
+output:		pointer to the record to be changed, NULL if search failed
 ************************/
-int edit(List *list){
+Record *getRecord(List *sList, char *song) {
+	Record *rec = NULL;
+	Node *subListHead = sList->pHead;
+
+	while (subListHead->pNext != NULL) {
+		// return the pointer to the record of the name "*song"
+		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
+			rec = subListHead->data;
+		}
+		subListHead = subListHead->pNext;
+	}
+	return rec;
+}
+
+/***********************
+Function:	edit
+input:		changes values in the records
+output:		TRUE if successful
+************************/
+Boolean edit(List *list){
 	List *subList = NULL;
 	Record *recordToChange = NULL;
-	Boolean ret = FALSE;
+	Boolean edited = FALSE;
+	Boolean escape = FALSE;
 	char userInput[51] = { '0' };
-	int songNumber = 0;
+	int songCount = 0;
 
-	printf("which artist would you like to look up?: ", userInput);
-
-	songNumber = searchArtist(&subList);
-
-	if (songNumber > 1) {
-		// ask which song to edit
-	}
-
-
-
-	while (ret != 1) {
-		printEditMenu();
-		scanf_s("%s", userInput, 50);
-		switch (atoi(userInput)) {
-		case 1:
-			clrscr();
-			
+	while (escape == FALSE) {
+		
+		// user chooses artist and song to change
+		while (recordToChange == NULL) {
+			printf("which artist would you like to look up?: (\"exit\" to cancel)");
 			scanf_s("%s", userInput, 50);
-			clrscr();
-			break;
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-			ret = TRUE;
-			break;
+
+			songCount = getArtist(&list, &subList, userInput);
+
+			if (strncmp(userInput, "exit", 50) == 0) {
+				return edited;
+			}
+			else if (songCount == 0) {
+				printf("Artist not found\n");
+			}
+			else if (songCount > 1) {
+				printList(&subList);
+				printf("which song would you like to edit?: ");
+				scanf_s("%s", userInput, 50);
+				recordToChange = getRecord(&subList, userInput);
+			}
+			else {
+				recordToChange = subList->pHead->data;
+			}
+		}
+
+		// user edits the song chosen
+		while (recordToChange != NULL) {
+			printEditMenu();
+			printf("choose the attribute to change: (\"exit\" when finished)\n");
+			scanf_s("%s", userInput, 50);
+			switch (atoi(userInput)) {
+			case 1:
+				printf("case 1\n");
+				break;
+			case 2:
+				printf("case 2\n");
+				break;
+			case 3:
+				printf("case 3\n");
+				break;
+			case 4:
+				printf("case 4\n");
+				break;
+			case 5:
+				printf("case 5\n");
+				break;
+			case 6:
+				printf("case 6\n");
+				break;
+			case 7:
+				printf("case 7\n");
+				break;
+			default:
+				if (strncmp(userInput, "exit", 50) == 0) {
+					recordToChange = NULL;
+				}
+				else {
+					printf("input not recognized");
+				}
+			}
 		}
 	}
+	return edited;
 }
 
 /***********************
@@ -234,7 +303,6 @@ input:		(none)
 output:		(none)
 ************************/
 void printEditMenu() {
-	printf("What attribute would you like to edit?\n");
 	printf("(1) Artist\n");
 	printf("(2) Album title\n");
 	printf("(3) Song title\n");
@@ -242,7 +310,6 @@ void printEditMenu() {
 	printf("(5) Song length\n");
 	printf("(6) Times played\n");
 	printf("(7) rating\n");
-	printf("(8) return\n");
 }
 
 // clears the screen. nuff said.
