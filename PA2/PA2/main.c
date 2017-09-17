@@ -32,7 +32,8 @@ int main()
 	{
 		printf("MSG: %s\n", message);
 		printMenu();
-		scanf_s("%s", userInput, 50);
+		//scanf_s("%s", userInput, 50);
+		getInput(userInput);
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
@@ -72,7 +73,6 @@ int main()
 			printf("(10) shuffle\n");
 			break;
 		case 11:
-			printf("(11) exit\n");
 			exit = 1;
 			break;
 		default:

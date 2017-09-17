@@ -200,6 +200,7 @@ void resetSubList(List *sList) {
 		listHead = listHead->pNext;
 		free(temp);
 	}
+
 }
 
 /***********************
@@ -212,7 +213,6 @@ Boolean edit(List *list){
 	subList.pHead = NULL;
 	subList.pTail = NULL;
 	subList.size = 0;
-	
 	Record *recordToChange = NULL;
 	Boolean edited = FALSE;
 	Boolean escape = FALSE;
@@ -224,11 +224,12 @@ Boolean edit(List *list){
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
 			
-			printf("which artist would you like to look up?: (\"exit\" to cancel)");
-			scanf_s("%s", userInput, 50);
+			printf("which artist would you like to look up? (\"exit\" to cancel): ");
+			getInput(userInput);
+
+			printf("debug");
 
 			songCount = getArtist(list, &subList, userInput);
-
 			if (strncmp(userInput, "exit", 50) == 0) {
 				return edited;
 			}
@@ -243,11 +244,7 @@ Boolean edit(List *list){
 					clrscr();
 					printList(&subList);
 					printf("which song would you like to edit?: ");
-					clear();
-					fgets(userInput, 50, stdin);
-					if (userInput[strlen(userInput) - 1] == '\n')
-						userInput[strlen(userInput) - 1] = '\0';
-
+					getInput(userInput);
 					recordToChange = getRecord(&subList, userInput);
 					if (recordToChange == NULL) {
 						printf("\ninput not recognized");
@@ -255,34 +252,69 @@ Boolean edit(List *list){
 				}
 			}
 		}
+		clrscr();
 
 		// user edits the song chosen
 		while (recordToChange != NULL) {
 			clrscr();
+			printf("artist: %s\n", recordToChange->artist);
+			printf("album title: %s\n", recordToChange->albumTitle);
+			printf("song title: %s\n", recordToChange->songTitle);
+			printf("genre: %s\n", recordToChange->genre);
+			printf("song length(minutes): %i\n", recordToChange->songLength->minutes);
+			printf("song length(seconds): %i\n", recordToChange->songLength->seconds);
+			printf("times played: %i\n", recordToChange->timesPlayed);
+			printf("rating: %i\n\n", recordToChange->rating);
+
 			printEditMenu();
-			printf("choose the attribute to change: (\"exit\" when finished)\n");
-			scanf_s("%s", userInput, 50);
+			printf("choose the attribute to change? (\"exit\" when finished): ");
+			// canf_s("%s", userInput, 50);
+			getInput(userInput);
 			switch (atoi(userInput)) {
 			case 1:
-				printf("case 1\n");
+				printf("what would you like to change Artist to?: ");
+				getInput(userInput);
+				strcpy(recordToChange->artist, userInput);
+				clrscr();
 				break;
 			case 2:
-				printf("case 2\n");
+				printf("What would you like to change Album title to?: ");
+				getInput(userInput);
+				strcpy(recordToChange->albumTitle, userInput);
+				clrscr();
 				break;
 			case 3:
-				printf("case 3\n");
+				printf("What would you like to change Song title to?: ");
+				getInput(userInput);
+				strcpy(recordToChange->songTitle, userInput);
+				clrscr();
 				break;
 			case 4:
-				printf("case 4\n");
+				printf("What would you like to change Genre to?: ");
+				getInput(userInput);
+				strcpy(recordToChange->genre, userInput);
+				clrscr();
 				break;
 			case 5:
-				printf("case 5\n");
+				printf("what would youl like minutes changed to?: ");
+				getInput(userInput);
+				recordToChange->songLength->minutes = atoi(userInput);
+				printf("what would youl like seconds changed to?");
+				getInput(userInput);
+				recordToChange->songLength->seconds = atoi(userInput);
+				clrscr();
 				break;
 			case 6:
-				printf("case 6\n");
+				printf("what would youl like times played changed to?: ");
+				getInput(userInput);
+				recordToChange->timesPlayed = atoi(userInput);
+				clrscr();
 				break;
 			case 7:
-				printf("case 7\n");
+				printf("what would youl like rating changed to?: ");
+				getInput(userInput);
+				recordToChange->rating = atoi(userInput);
+				clrscr();
 				break;
 			default:
 				if (strncmp(userInput, "exit", 50) == 0) {
@@ -305,18 +337,6 @@ output:		(none)
 void printList(List *list) {
 	Node *pCur = (list)->pHead;
 
-	//while (pCur->pNext != NULL) {
-	//	printf("\nArtist: \t%s\n", pCur->pNext->data->artist);
-	//	printf("Album: \t\t%s\n", pCur->pNext->data->albumTitle);
-	//	printf("Title: \t\t%s\n", pCur->pNext->data->songTitle);
-	//	printf("Genre: \t\t%s\n", pCur->pNext->data->genre);
-	//	printf("Length: \t%i:", pCur->pNext->data->songLength->minutes);
-	//	printf("%i\n", pCur->pNext->data->songLength->seconds);
-	//	printf("Times Played: \t%i\n", pCur->pNext->data->timesPlayed);
-	//	printf("Rating: \t%i\n\n", pCur->pNext->data->rating);
-	//	pCur = pCur->pNext;
-	//}
-
 	while (pCur != NULL) {
 		printf("\nArtist: \t%s\n", pCur->data->artist);
 		printf("Album: \t\t%s\n", pCur->data->albumTitle);
@@ -328,7 +348,6 @@ void printList(List *list) {
 		printf("Rating: \t%i\n\n", pCur->data->rating);
 		pCur = pCur->pNext;
 	}
-
 }
 
 /***********************
@@ -365,12 +384,21 @@ void printEditMenu() {
 	printf("(7) rating\n");
 }
 
-// clears the screen. nuff said.
-void clrscr(){
-	system("@cls||clear");
-}
-
+// gets rid of null character input buffer
 void clear(void)
 {
 	while (getchar() != '\n');
+}
+
+// clears the screen. nuff said.
+void clrscr() {
+	system("@cls||clear");
+}
+
+void getInput(char *in)
+{
+	//clear();
+	fgets(in, 50, stdin);
+	if (in[strlen(in) - 1] == '\n')
+		in[strlen(in) - 1] = '\0';
 }

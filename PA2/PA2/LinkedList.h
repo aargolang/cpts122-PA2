@@ -46,7 +46,9 @@ int edit(List *list);
 void printList(List *list);
 void printMenu();
 void printEditMenu();
-void clrscr();
+void getInput(char *in);
 void clear(void);
+void clrscr();
+
 
 #endif
