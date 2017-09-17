@@ -17,36 +17,29 @@ Node *makenode(Record *dat){
 /***********************
 Function:		insertFront
 input:			pList and node to insert
-output:			1 for successfully allocating space for a node; 0 otherwise
+output:			TRUE for successfully allocating space for a node; FALSE otherwise
 description:	insert node at the (!!!)FRONT(!!!) of the list
 ************************/
-int insertFront(List *pList, Record *dat){
-	int success = 1;
+Boolean insertFront(List *pList, Record *dat) {
+	Boolean success = FALSE;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
 	pMem = makenode(dat);
 
-	if ((pList)->pHead == NULL){ // list is empty
-		if (pMem == NULL){
-			success = 0;
-		}
-		else{
-			(pList)->pHead = pMem;
-			(pList)->pTail = pMem;
-			pList->size++;
-		}
+	if ((pList->pHead == NULL) && (pMem != NULL)){ 
+		// list is empty
+		pList->pHead = pMem;
+		pList->pTail = pMem;
+		pList->size++;
+		success = TRUE;
 	}
 	else { // if the list is not empty
-
-		pTemp = (pList)->pHead;
-
-		while (pTemp->pNext != NULL){
-			pTemp = pTemp->pNext;
-		}
-	
-		pTemp->pNext = pMem;
-		pMem->pPrev = pTemp;
+		pTemp = pList->pHead;
+		pMem->pNext = pTemp;
+		pTemp->pPrev = pMem;
+		pList->pHead = pMem;
 		pList->size++;
+		success = TRUE;
 	}
 	
 	return success;
@@ -78,11 +71,11 @@ Function:	load
 input:		read from file into list
 output:		1 for successfully loading, 0 otherwise
 ************************/
-int load(List *pList) {
-	int success = 0, index = 1;
+Boolean load(List *pList) {
+	Boolean success = 0;
+	int index = 1;
 	FILE *filePointer = NULL;
-	char line[100] = { '\0' }, copyLine[100] = { '\0' };
-	char strBuff[100];
+	char line[100] = { '\0' }, copyLine[100] = { '\0' }, strBuff[100];
 	Record *rMem = NULL;
 	Duration *dMem = NULL;
 
@@ -103,35 +96,27 @@ int load(List *pList) {
 		}
 		rMem->artist = (char*)malloc(strlen(strBuff) + 1);
 		strcpy(rMem->artist, strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		rMem->albumTitle = (char*)malloc(strlen(strBuff) + 1);
 		strcpy(rMem->albumTitle, strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		rMem->songTitle = (char*)malloc((strlen(strBuff) + 1) * sizeof(char));
 		strcpy(rMem->songTitle, strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		rMem->genre = (char*)malloc(strlen(strBuff) + 1);
 		strcpy(rMem->genre, strBuff);
-
 		strcpy(strBuff, strtok(NULL, ":"));
 		dMem->minutes = atoi(strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		dMem->seconds = atoi(strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		rMem->timesPlayed = atoi(strBuff);
-
 		strcpy(strBuff, strtok(NULL, ","));
 		rMem->rating = atoi(strBuff);
 
 		rMem->songLength = dMem;
-
 		insertFront(pList, rMem);
-
+		success = TRUE;
 		index++;
 	}
 
@@ -142,73 +127,11 @@ int load(List *pList) {
 }
 
 /***********************
-Function:	getArtist
-input:		list, subList, artists name
-output:		number of songs found by the artist
-************************/
-int getArtist(List *pList, List *sList, char *artist) {
-	int count = 0;
-	Node *listHead = pList->pHead;
-
-	while (listHead->pNext != NULL) {
-		// if the artist if found then copy the pointer to the record into the sublist
-		if (strncmp(listHead->data->artist, artist, 50) == 0) {
-			insertFront(sList, listHead->data);
-			count++;
-		}
-		listHead = listHead->pNext;
-	}
-
-	return count;
-}
-
-/***********************
-Function:	getRecord
-input:		sublist, songname
-output:		pointer to the record to be changed, NULL if search failed
-************************/
-Record *getRecord(List *sList, char *song) {
-	Record *rec = NULL;
-	Node *subListHead = sList->pHead;
-
-	while (subListHead != NULL) {
-		// return the pointer to the record of the name "*song"
-		printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
-		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
-			rec = subListHead->data;
-		}
-		subListHead = subListHead->pNext;
-	}
-	return rec;
-}
-
-/***********************
-Function:	resetSubList
-input:		sublist
-output:		none
-************************/
-void resetSubList(List *sList) {
-	
-	Node *listHead = sList->pHead;
-	Node *temp;
-
-	while (listHead != NULL) {
-		// free all of the nodes in the sublist, not supposed to free record data
-		listHead->data = NULL;
-		listHead->pPrev = NULL;
-		temp = listHead;
-		listHead = listHead->pNext;
-		free(temp);
-	}
-
-}
-
-/***********************
 Function:	edit
 input:		changes values in the records
 output:		TRUE if successful
 ************************/
-Boolean edit(List *list){
+Boolean edit(List *list) {
 	List subList;
 	subList.pHead = NULL;
 	subList.pTail = NULL;
@@ -223,7 +146,7 @@ Boolean edit(List *list){
 		resetSubList(&subList);
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
-			
+
 			printf("which artist would you like to look up? (\"exit\" to cancel): ");
 			getInput(userInput);
 
@@ -240,7 +163,7 @@ Boolean edit(List *list){
 				recordToChange = subList.pHead->data;
 			}
 			else {
-				while (recordToChange == NULL){
+				while (recordToChange == NULL) {
 					clrscr();
 					printList(&subList);
 					printf("which song would you like to edit?: ");
@@ -319,6 +242,7 @@ Boolean edit(List *list){
 			default:
 				if (strncmp(userInput, "exit", 50) == 0) {
 					recordToChange = NULL;
+					clrscr();
 				}
 				else {
 					printf("input not recognized");
@@ -330,13 +254,76 @@ Boolean edit(List *list){
 }
 
 /***********************
+Function:	getArtist
+input:		list, subList, artists name
+output:		number of songs found by the artist
+************************/
+int getArtist(List *pList, List *sList, char *artist) {
+	int count = 0;
+	Node *listHead = pList->pHead;
+
+	while (listHead->pNext != NULL) {
+		// if the artist if found then copy the pointer to the record into the sublist
+		if (strncmp(listHead->data->artist, artist, 50) == 0) {
+			insertFront(sList, listHead->data);
+			count++;
+		}
+		listHead = listHead->pNext;
+	}
+
+	return count;
+}
+
+/***********************
+Function:	getRecord
+input:		sublist, songname
+output:		pointer to the record to be changed, NULL if search failed
+************************/
+Record *getRecord(List *sList, char *song) {
+	Record *rec = NULL;
+	Node *subListHead = sList->pHead;
+
+	while (subListHead != NULL) {
+		// return the pointer to the record of the name "*song"
+		printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
+		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
+			rec = subListHead->data;
+		}
+		subListHead = subListHead->pNext;
+	}
+	return rec;
+}
+
+/***********************
+Function:	resetSubList
+input:		sublist
+output:		none
+************************/
+void resetSubList(List *sList) {
+	
+	Node *listHead = sList->pHead;
+	Node *temp;
+
+	while (sList->pHead != NULL) {
+		// free all of the nodes in the sublist, not supposed to free record data
+		sList->pHead->data = NULL;
+		sList->pHead->pPrev = NULL;
+		temp = sList->pHead;
+		sList->pHead = sList->pHead->pNext;
+		temp->pNext = NULL;
+		free(temp);
+		sList->size--;
+	}
+	sList->pTail = NULL;
+}
+
+/***********************
 Function:	printList
 input:		pList to be printed
 output:		(none)
 ************************/
 void printList(List *list) {
 	Node *pCur = (list)->pHead;
-
 	while (pCur != NULL) {
 		printf("\nArtist: \t%s\n", pCur->data->artist);
 		printf("Album: \t\t%s\n", pCur->data->albumTitle);
@@ -382,12 +369,6 @@ void printEditMenu() {
 	printf("(5) Song length\n");
 	printf("(6) Times played\n");
 	printf("(7) rating\n");
-}
-
-// gets rid of null character input buffer
-void clear(void)
-{
-	while (getchar() != '\n');
 }
 
 // clears the screen. nuff said.

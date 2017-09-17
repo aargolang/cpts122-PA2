@@ -37,17 +37,17 @@ typedef struct list {
 } List;
 
 Node *makenode(Record *dat);
-int insertFront(List *pList, Record *dat);
+Boolean insertFront(List *pList, Record *dat);
 Boolean deletenode(Node ***pList, Node *dat);
-int load(List *list);
+Boolean load(List *list);
+Boolean edit(List *list);
 int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
-int edit(List *list);
+void resetSubList(List *sList);
 void printList(List *list);
 void printMenu();
 void printEditMenu();
 void getInput(char *in);
-void clear(void);
 void clrscr();
 
 
