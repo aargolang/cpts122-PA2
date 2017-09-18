@@ -10,6 +10,7 @@ Description:	create and implement a imitation digital music manager
 Files:			- main.c
 				- LinkedList.h
 				- LinkedList.c
+				- musicPlayList.csv
 *********************************/
 
 #include "LinkedList.h"
