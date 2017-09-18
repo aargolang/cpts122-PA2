@@ -67,6 +67,39 @@ int deletenode(Node ***pList, Node *dat){
 }
 
 /***********************
+Function:	store
+input:
+output:		TRUE if file opened for w+, FALSE if otherwise
+************************/
+BOOL store(List *pList) {
+	BOOL success = FALSE;
+ 	FILE *filepointer = fopen("musicPlayList.csv", "w+");
+	Node *pCur = pList->pTail;
+	char nameBuff[25];
+	int index = 0;
+
+	if(filepointer != NULL){
+		success = TRUE;
+		while (index < pList->size) {
+			if (strstr(pCur->data->artist, ",") != NULL) {
+				strcpy(nameBuff, "\"");
+				strcat(nameBuff, pCur->data->artist);
+				strcat(nameBuff, "\"");
+			}
+			else {
+				strcpy(nameBuff, pCur->data->artist);
+			}
+
+			fprintf(filepointer, "%s,%s,%s,%s,%i:%i,%i,%i\n", nameBuff, pCur->data->albumTitle, pCur->data->songTitle, pCur->data->genre, pCur->data->songLength->minutes, pCur->data->songLength->seconds, pCur->data->timesPlayed, pCur->data->rating);
+			pCur = pCur->pPrev;
+			index++;
+		}
+		fclose(filepointer);
+	}
+	return success;
+}
+
+/***********************
 Function:	load
 input:		read from file into list
 output:		TRUE for successfully loading, FALSE otherwise
@@ -147,7 +180,9 @@ BOOL edit(List *list) {
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
 
-			printf("which artist would you like to look up? (\"exit\" to cancel): ");
+			printSongs(list);
+			printf("\nwhich artist would you like to look up? (\"exit\" to cancel): ");
+
 			getInput(userInput);
 
 			printf("debug");
@@ -166,7 +201,7 @@ BOOL edit(List *list) {
 				while (recordToChange == NULL) {
 					clrscr();
 					printList(&subList);
-					printf("which song would you like to edit?: ");
+					printf("\nwhich song would you like to edit?: ");
 					getInput(userInput);
 					recordToChange = getRecord(&subList, userInput);
 					if (recordToChange == NULL) {
@@ -254,8 +289,8 @@ BOOL edit(List *list) {
 }
 
 /***********************
-Function:	edit
-input:		changes values in the records
+Function:	rate
+input:		pList
 output:		TRUE if successful, FALSE if otherwise
 ************************/
 BOOL rate(List *pList){
@@ -266,13 +301,14 @@ BOOL rate(List *pList){
 	Record *rMem = NULL;
 
 	while (exit == FALSE) {
-		printf("Which song (by song name) do you want to change?: ");
+		printSongs(pList);
+		printf("\nWhich song (by song name) do you want to change?: ");
 		getInput(userInput);
 		rMem = getRecord(pList, userInput);
 
 		if (rMem != NULL) {
 			while (exit == FALSE){
-				printf("How many stars do you wish to rate it?: ");
+				printf("\nHow many stars do you wish to rate it?: ");
 				getInput(userInput);
 				atoiInput = atoi(userInput);
 				if ((atoiInput > 0) && (atoiInput < 6)){
@@ -294,34 +330,35 @@ BOOL rate(List *pList){
 }
 
 /***********************
-Function:	edit
-input:		changes values in the records
+Function:	play
+input:		pList
 output:		TRUE if successful, FALSE if otherwise
 ************************/
 BOOL play(List *pList) {
 	BOOL success = FALSE;
 	BOOL exit = FALSE;
 	char userInput[50] = { '\0' };
-	Record *rMem = NULL;
+	Node *pStart = NULL;
 
 	while (strcmp(userInput, "exit") != 0) {
 		clrscr();
-		printList(pList);
-		printf("Which song (by song name) do you want to play? (\"exit\" to stop): ");
+		printSongs(pList);
+		printf("\nFrom which song (by song name) do you want to play? (\"exit\" to stop): ");
 		getInput(userInput);
-		rMem = getRecord(pList, userInput);
+		pStart = getSong(pList, userInput);
 
-		if (rMem != NULL) {
-			printf("playing %s - %s\n", rMem->artist, rMem->songTitle);
-			Sleep(3000);
-			rMem == NULL;
+		if (pStart == NULL)
+			printf("song not found\n");
+
+		while (pStart != NULL) {
+			clrscr();
+			printf("Currently Playing:\n%s\n%s\n%s\n", pStart->data->artist, pStart->data->albumTitle, pStart->data->songTitle);
+			Sleep(2000);
+			pStart->data->timesPlayed++;
+			pStart = pStart->pNext;
 			success = TRUE;
 		}
-		else {
-			printf("Song not found \n");
-		}
 	}
-
 	return success;
 }
 
@@ -344,6 +381,24 @@ int getArtist(List *pList, List *sList, char *artist) {
 	}
 
 	return count;
+}
+
+/***********************
+Function:	getNode
+input:		list, subList, artists name
+output:		number of songs found by the artist
+************************/
+Node *getSong(List *pList, char *song) {
+	Node *listHead = pList->pHead;
+
+	while (listHead != NULL) {
+		// if the song is found then return the pointer to that Node
+		if (strcmp(listHead->data->songTitle, song) == 0) {
+			return listHead;
+		}
+		listHead = listHead->pNext;
+	}
+	return NULL;
 }
 
 /***********************
@@ -410,6 +465,22 @@ void printList(List *list) {
 }
 
 /***********************
+Function:	printList
+input:		pList to be printed
+output:		(none)
+************************/
+void printSongs(List *list) {
+	int i = 1;
+	Node *pCur = (list)->pHead;
+	while (pCur != NULL) {
+		printf("%i: %s - %s\n", i, pCur->data->artist, pCur->data->songTitle);
+		pCur = pCur->pNext;
+		i++;
+	}
+}
+
+
+/***********************
 Function:	printMenu
 input:		(none)
 output:		(none)
@@ -418,13 +489,13 @@ void printMenu() {
 	printf("(1) load\n");
 	printf("(2) store\n");
 	printf("(3) display\n");
-	printf("(4) insert\n");
-	printf("(5) delete\n");
+	printf("(4) insert (not implemented)\n");
+	printf("(5) delete (not implemented)\n");
 	printf("(6) edit\n");
-	printf("(7) sort\n");
+	printf("(7) sort (not implemented)\n");
 	printf("(8) rate\n");
 	printf("(9) play\n");
-	printf("(10) shuffle\n");
+	printf("(10) shuffle (not implemented)\n");
 	printf("(11) exit\n");
 }
 
@@ -451,7 +522,6 @@ void clrscr() {
 // gets input in a smart way
 char *getInput(char *in)
 {
-	//clear();
 	fgets(in, 50, stdin);
 	if (in[strlen(in) - 1] == '\n')
 		in[strlen(in) - 1] = '\0';

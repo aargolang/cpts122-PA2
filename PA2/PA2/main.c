@@ -20,6 +20,7 @@ Files:			- main.c
 
 int main()
 {
+	BOOL success = FALSE;
 	List songList;
 	songList.pHead = NULL;
 	songList.pTail = NULL;
@@ -31,19 +32,27 @@ int main()
 
 	while (exit != 1)
 	{
-		printf("MSG: %s\n", message);
+		printf("MESSAGE: %s\n", message);
 		printMenu();
-		//scanf_s("%s", userInput, 50);
 		getInput(userInput);
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
-			load(&songList);
-			strncpy(message, "loaded from file",17);
+			success = load(&songList);
+			if (success = TRUE)
+				strncpy(message, "loaded from file",50);
+			else 
+				strncpy(message, "file failed to load", 50);
 			clrscr();
 			break;
 		case 2:
-			printf("(2) store\n");
+			clrscr();
+			success = store(&songList);
+			if (success = TRUE)
+				strncpy(message, "successfully written to file", 50);
+			else
+				strncpy(message, "failed to open file to write+", 50);
+			clrscr();
 			break;
 		case 3:
 			clrscr();
@@ -51,18 +60,22 @@ int main()
 			strncpy(message, "\0", 2); 
 			break;
 		case 4:
-			printf("(4) insert\n");
+			printf("(4) insert (not inplemented)\n");
 			break;
 		case 5:
-			printf("(5) delete\n");
+			printf("(5) delete (not implemented)\n");
 			break;
 		case 6:
 			clrscr();
-			edit(&songList);
+			success = edit(&songList);
+			if (success = TRUE)
+				strncpy(message, "changes made to list", 50);
+			else
+				strncpy(message, "no changes made", 50);
 			clrscr();
 			break;
 		case 7:
-			printf("(7) sort\n");
+			printf("(7) sort (not implemented)\n");
 			break;
 		case 8:
 			clrscr();
@@ -74,9 +87,10 @@ int main()
 			clrscr();
 			break;
 		case 10:
-			printf("(10) shuffle\n");
+			printf("(10) shuffle (not implemented)\n");
 			break;
 		case 11:
+			store(&songList);
 			exit = 1;
 			break;
 		default:

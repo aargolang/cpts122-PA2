@@ -41,14 +41,17 @@ typedef struct list {
 Node *makenode(Record *dat);
 BOOL insertFront(List *pList, Record *dat);
 BOOL deletenode(Node ***pList, Node *dat);
+BOOL store(List *pList);
 BOOL load(List *list);
 BOOL edit(List *list);
 BOOL play(List *list);
 int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
+Node *getSong(List *pList, char *song);
 void resetSubList(List *sList);
 char *getInput(char *in);
 void printList(List *list);
+void printSongs(List *list);
 void printMenu();
 void printEditMenu();
 
