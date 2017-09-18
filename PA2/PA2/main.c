@@ -14,6 +14,7 @@ Files:			- main.c
 
 #include "LinkedList.h"
 #include <stdio.h>
+#include <Windows.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,10 +65,13 @@ int main()
 			printf("(7) sort\n");
 			break;
 		case 8:
-			printf("(8) rate\n");
+			clrscr();
+			rate(&songList);
+			clrscr();
 			break;
 		case 9:
-			printf("(9) play\n");
+			play(&songList);
+			clrscr();
 			break;
 		case 10:
 			printf("(10) shuffle\n");

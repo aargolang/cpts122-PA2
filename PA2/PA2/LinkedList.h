@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 typedef struct duration{
 	int minutes;
@@ -26,9 +27,9 @@ typedef struct node {
 	struct node *pPrev;
 } Node;
 
-typedef enum boolean {
-	FALSE, TRUE
-} Boolean;
+//typedef enum BOOL {
+//	FALSE, TRUE
+//} BOOL;
 
 typedef struct list {
 	int size;
@@ -36,19 +37,21 @@ typedef struct list {
 	Node *pTail;
 } List;
 
+
 Node *makenode(Record *dat);
-Boolean insertFront(List *pList, Record *dat);
-Boolean deletenode(Node ***pList, Node *dat);
-Boolean load(List *list);
-Boolean edit(List *list);
+BOOL insertFront(List *pList, Record *dat);
+BOOL deletenode(Node ***pList, Node *dat);
+BOOL load(List *list);
+BOOL edit(List *list);
+BOOL play(List *list);
 int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
 void resetSubList(List *sList);
+char *getInput(char *in);
 void printList(List *list);
 void printMenu();
 void printEditMenu();
-void getInput(char *in);
-void clrscr();
 
+void clrscr();
 
 #endif

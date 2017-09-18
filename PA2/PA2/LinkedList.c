@@ -20,8 +20,8 @@ input:			pList and node to insert
 output:			TRUE for successfully allocating space for a node; FALSE otherwise
 description:	insert node at the (!!!)FRONT(!!!) of the list
 ************************/
-Boolean insertFront(List *pList, Record *dat) {
-	Boolean success = FALSE;
+BOOL insertFront(List *pList, Record *dat) {
+	BOOL success = FALSE;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
 	pMem = makenode(dat);
@@ -69,10 +69,10 @@ int deletenode(Node ***pList, Node *dat){
 /***********************
 Function:	load
 input:		read from file into list
-output:		1 for successfully loading, 0 otherwise
+output:		TRUE for successfully loading, FALSE otherwise
 ************************/
-Boolean load(List *pList) {
-	Boolean success = 0;
+BOOL load(List *pList) {
+	BOOL success = 0;
 	int index = 1;
 	FILE *filePointer = NULL;
 	char line[100] = { '\0' }, copyLine[100] = { '\0' }, strBuff[100];
@@ -129,16 +129,16 @@ Boolean load(List *pList) {
 /***********************
 Function:	edit
 input:		changes values in the records
-output:		TRUE if successful
+output:		TRUE if successful, FALSE if otherwise
 ************************/
-Boolean edit(List *list) {
+BOOL edit(List *list) {
 	List subList;
 	subList.pHead = NULL;
 	subList.pTail = NULL;
 	subList.size = 0;
 	Record *recordToChange = NULL;
-	Boolean edited = FALSE;
-	Boolean escape = FALSE;
+	BOOL edited = FALSE;
+	BOOL escape = FALSE;
 	char userInput[51] = { '0' };
 	int songCount = 0;
 
@@ -254,6 +254,78 @@ Boolean edit(List *list) {
 }
 
 /***********************
+Function:	edit
+input:		changes values in the records
+output:		TRUE if successful, FALSE if otherwise
+************************/
+BOOL rate(List *pList){
+	BOOL success = FALSE;
+	BOOL exit = FALSE;
+	char userInput[50] = { '\0' };
+	int atoiInput = 0;
+	Record *rMem = NULL;
+
+	while (exit == FALSE) {
+		printf("Which song (by song name) do you want to change?: ");
+		getInput(userInput);
+		rMem = getRecord(pList, userInput);
+
+		if (rMem != NULL) {
+			while (exit == FALSE){
+				printf("How many stars do you wish to rate it?: ");
+				getInput(userInput);
+				atoiInput = atoi(userInput);
+				if ((atoiInput > 0) && (atoiInput < 6)){
+					rMem->rating = atoiInput;
+					success = TRUE;
+					exit = TRUE;
+				}
+				else {
+					printf("value needs to be between 1 and 5\n");
+				}
+			}
+		}
+		else {
+			printf("Song not found \n");
+		}
+	}
+
+	return success;
+}
+
+/***********************
+Function:	edit
+input:		changes values in the records
+output:		TRUE if successful, FALSE if otherwise
+************************/
+BOOL play(List *pList) {
+	BOOL success = FALSE;
+	BOOL exit = FALSE;
+	char userInput[50] = { '\0' };
+	Record *rMem = NULL;
+
+	while (strcmp(userInput, "exit") != 0) {
+		clrscr();
+		printList(pList);
+		printf("Which song (by song name) do you want to play? (\"exit\" to stop): ");
+		getInput(userInput);
+		rMem = getRecord(pList, userInput);
+
+		if (rMem != NULL) {
+			printf("playing %s - %s\n", rMem->artist, rMem->songTitle);
+			Sleep(3000);
+			rMem == NULL;
+			success = TRUE;
+		}
+		else {
+			printf("Song not found \n");
+		}
+	}
+
+	return success;
+}
+
+/***********************
 Function:	getArtist
 input:		list, subList, artists name
 output:		number of songs found by the artist
@@ -285,7 +357,7 @@ Record *getRecord(List *sList, char *song) {
 
 	while (subListHead != NULL) {
 		// return the pointer to the record of the name "*song"
-		printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
+		// printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
 		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
 			rec = subListHead->data;
 		}
@@ -376,10 +448,13 @@ void clrscr() {
 	system("@cls||clear");
 }
 
-void getInput(char *in)
+// gets input in a smart way
+char *getInput(char *in)
 {
 	//clear();
 	fgets(in, 50, stdin);
 	if (in[strlen(in) - 1] == '\n')
 		in[strlen(in) - 1] = '\0';
+
+	return in;
 }
