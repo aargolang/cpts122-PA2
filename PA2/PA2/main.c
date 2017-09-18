@@ -98,9 +98,5 @@ int main()
 			strncpy(message, "\0", 2);
 		}
 	}
-	
-	printf("thats all folks!\n");
-	getchar();
-
 	return 0;
 }

@@ -150,7 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="musicPlayList.csv" />
-    <None Include="results.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
