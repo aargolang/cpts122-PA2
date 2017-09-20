@@ -43,6 +43,7 @@ BOOL insertFront(List *pList, Record *dat);
 BOOL deletenode(Node ***pList, Node *dat);
 BOOL store(List *pList);
 BOOL load(List *list);
+BOOL del(List *pList);
 BOOL edit(List *list);
 BOOL play(List *list);
 int getArtist(List *pList, List *sList, char *artist);

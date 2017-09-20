@@ -159,6 +159,34 @@ BOOL load(List *pList) {
 	return success;
 }
 
+BOOL del(List *pList) {
+	BOOL success = FALSE;
+	BOOL exit = FALSE;
+	char userInput[50] = { '\0' };
+	Node *pCur = NULL;
+	printSongs(pList);
+
+	if (pList->size > 0) {
+		while (exit == FALSE){
+			printf("Which song would you like to delete? (\"exit\" to leave): ");
+			getInput(userInput);
+
+			pCur = getSong(pList, userInput);
+
+			if (pCur != NULL) {
+				// remove node
+			}
+			else if (strcmp(userInput, "exit") == 0) {
+				exit = TRUE;
+			}
+			else {
+				// song not found
+			}
+		}
+	}
+	return success;
+}
+
 /***********************
 Function:	edit
 input:		changes values in the records

@@ -64,7 +64,8 @@ int main()
 			printf("(4) insert (not inplemented)\n");
 			break;
 		case 5:
-			printf("(5) delete (not implemented)\n");
+			clrscr();
+			del(&songList);
 			break;
 		case 6:
 			clrscr();
