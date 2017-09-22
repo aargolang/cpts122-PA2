@@ -30,7 +30,6 @@ int main()
 	char userInput[51] = { '0' };
 	char message[51] = { '\0' };
 
-
 	while (exit != 1)
 	{
 		printf("MESSAGE: %s\n", message);
@@ -46,6 +45,7 @@ int main()
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
+			freeList(&songList);
 			success = load(&songList);
 			if (success = TRUE)
 				strncpy(message, "loaded from file",50);
@@ -65,10 +65,16 @@ int main()
 		case 3:
 			clrscr();
 			printList(&songList);
+			printf("press any key to continue");
+			getInput(userInput);
 			strncpy(message, "\0", 2); 
+			clrscr();
 			break;
 		case 4:
-			printf("(4) insert (not inplemented)\n");
+			clrscr();
+			insert(&songList);
+			strncpy(message, "song inserted", 50);
+			clrscr();
 			break;
 		case 5:
 			clrscr();
@@ -101,6 +107,7 @@ int main()
 			break;
 		case 11:
 			store(&songList);
+			freeList(&songList);
 			exit = 1;
 			break;
 		default:

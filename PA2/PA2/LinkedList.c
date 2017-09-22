@@ -138,6 +138,58 @@ BOOL load(List *pList) {
 }
 
 /***********************
+Function:	insert
+input:		list
+output:		(none)
+************************/
+void insert(List *pList) {
+	Record *rMem = NULL;
+	Duration *dMem = NULL;
+	BOOL done = FALSE;
+	char userInput[50] = { '\0' };
+
+	rMem = (Record*)malloc(sizeof(Record));
+	dMem = (Duration*)malloc(sizeof(Duration));
+	printf("what is the artist's name?: ");
+	getInput(userInput);
+	rMem->artist = (char*)malloc(strlen(userInput) + 1);
+	strcpy(rMem->artist, userInput);
+	
+	printf("what is the album title?: ");
+	getInput(userInput);
+	rMem->albumTitle = (char*)malloc(strlen(userInput) + 1);
+	strcpy(rMem->albumTitle, userInput);
+	
+	printf("what is the song title?: ");
+	getInput(userInput);
+	rMem->songTitle = (char*)malloc(strlen(userInput) + 1);
+	strcpy(rMem->songTitle, userInput);
+	
+	printf("what is the genre you wish to specify?: ");
+	getInput(userInput);
+	rMem->genre = (char*)malloc(strlen(userInput) + 1);
+	strcpy(rMem->genre, userInput);
+	
+	printf("how many minutes long is the song?: ");
+	getInput(userInput);
+	rMem->songLength->minutes = atoi(userInput);
+	
+	printf("...and how many seconds long is the song?: ");
+	getInput(userInput);
+	rMem->songLength->seconds = atoi(userInput);
+
+	printf("how many 'times played' do you wish to specify?: ");
+	getInput(userInput);
+	rMem->timesPlayed = atoi(userInput);
+
+	printf("what do you rate the song?: ");
+	getInput(userInput);
+	rMem->rating = atoi(userInput);
+
+	insertFront(pList, rMem);
+}
+
+/***********************
 Function:	del
 input:		delete node with specefied songname
 output:		TRUE for successfully deleting, FALSE otherwise
