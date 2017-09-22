@@ -27,10 +27,6 @@ typedef struct node {
 	struct node *pPrev;
 } Node;
 
-//typedef enum BOOL {
-//	FALSE, TRUE
-//} BOOL;
-
 typedef struct list {
 	int size;
 	Node *pHead;
@@ -40,22 +36,23 @@ typedef struct list {
 
 Node *makenode(Record *dat);
 BOOL insertFront(List *pList, Record *dat);
-BOOL deletenode(Node ***pList, Node *dat);
 BOOL store(List *pList);
 BOOL load(List *list);
 BOOL del(List *pList);
 BOOL edit(List *list);
+BOOL rate(List *pList);
 BOOL play(List *list);
 int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
 Node *getSong(List *pList, char *song);
+void freeList(List *pList);
+BOOL removeNode(List *pList, Node *delNode);
 void resetSubList(List *sList);
-char *getInput(char *in);
 void printList(List *list);
 void printSongs(List *list);
 void printMenu();
 void printEditMenu();
-
 void clrscr();
+char *getInput(char *in);
 
 #endif

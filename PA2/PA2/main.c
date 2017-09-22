@@ -34,8 +34,15 @@ int main()
 	while (exit != 1)
 	{
 		printf("MESSAGE: %s\n", message);
+		printf("list size: %i\n", songList.size);
 		printMenu();
 		getInput(userInput);
+		if (strcmp(userInput, "exit") == 0) {
+			exit = 1;
+		}
+		else if (strcmp(userInput, "free") == 0) {
+			freeList(&songList);
+		}
 		switch (atoi(userInput)) {
 		case 1:
 			clrscr();
@@ -66,6 +73,7 @@ int main()
 		case 5:
 			clrscr();
 			del(&songList);
+			clrscr();
 			break;
 		case 6:
 			clrscr();

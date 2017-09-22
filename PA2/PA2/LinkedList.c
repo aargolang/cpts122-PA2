@@ -46,34 +46,13 @@ BOOL insertFront(List *pList, Record *dat) {
 }
 
 /***********************
-Function:	deleteNode
-input:		pList and record to be deleted
-output:		1 for successfully deleting node; 0 otherwise (node didnt exist)
-************************/
-int deletenode(Node ***pList, Node *dat){
-	// TODO: needs to be revised to delete the node passed in
-	Node *pTemp = *pList;
-
-	if (*pList == NULL)
-		return FALSE;
-	else
-	{
-		*pList = pTemp->pNext;
-		pTemp->pPrev = *pList;
-		//free(pTemp->name);
-		free(pTemp);
-		return TRUE;
-	}
-}
-
-/***********************
 Function:	store
 input:
 output:		TRUE if file opened for w+, FALSE if otherwise
 ************************/
 BOOL store(List *pList) {
 	BOOL success = FALSE;
- 	FILE *filepointer = fopen("musicPlayList.csv", "w+");
+ 	FILE *filepointer = fopen("temp.csv", "w+");
 	Node *pCur = pList->pTail;
 	char nameBuff[25];
 	int index = 0;
@@ -113,7 +92,6 @@ BOOL load(List *pList) {
 	Duration *dMem = NULL;
 
 	filePointer = fopen("musicPlayList.csv", "r");
-
 
 	while (fgets(line, 100, filePointer) != NULL) {
 		strcpy(copyLine, line);
@@ -159,6 +137,11 @@ BOOL load(List *pList) {
 	return success;
 }
 
+/***********************
+Function:	del
+input:		delete node with specefied songname
+output:		TRUE for successfully deleting, FALSE otherwise
+************************/
 BOOL del(List *pList) {
 	BOOL success = FALSE;
 	BOOL exit = FALSE;
@@ -174,13 +157,14 @@ BOOL del(List *pList) {
 			pCur = getSong(pList, userInput);
 
 			if (pCur != NULL) {
+				removeNode(pList, pCur);
 				// remove node
 			}
 			else if (strcmp(userInput, "exit") == 0) {
 				exit = TRUE;
 			}
 			else {
-				// song not found
+				printf("song not found\n");
 			}
 		}
 	}
@@ -412,24 +396,6 @@ int getArtist(List *pList, List *sList, char *artist) {
 }
 
 /***********************
-Function:	getNode
-input:		list, subList, artists name
-output:		number of songs found by the artist
-************************/
-Node *getSong(List *pList, char *song) {
-	Node *listHead = pList->pHead;
-
-	while (listHead != NULL) {
-		// if the song is found then return the pointer to that Node
-		if (strcmp(listHead->data->songTitle, song) == 0) {
-			return listHead;
-		}
-		listHead = listHead->pNext;
-	}
-	return NULL;
-}
-
-/***********************
 Function:	getRecord
 input:		sublist, songname
 output:		pointer to the record to be changed, NULL if search failed
@@ -450,12 +416,96 @@ Record *getRecord(List *sList, char *song) {
 }
 
 /***********************
+Function:	getSong
+input:		list, song name
+output:		pointer to the node containing the song
+************************/
+Node *getSong(List *pList, char *song) {
+	Node *listHead = pList->pHead;
+
+	while (listHead != NULL) {
+		// if the song is found then return the pointer to that Node
+		if (strcmp(listHead->data->songTitle, song) == 0) {
+			return listHead;
+		}
+		listHead = listHead->pNext;
+	}
+	return NULL;
+}
+
+/***********************
+Function:	freeList
+input:		list
+output:		(none)
+************************/
+void freeList(List *pList) {
+	BOOL removed = TRUE;
+	Node *pCur = NULL;
+
+	while (removed == TRUE) {
+		pCur = pList->pHead;
+		removed = removeNode(pList, pCur);
+	}
+}
+
+/***********************
+Function:	removeNode
+input:		remove node from list
+output:		TRUE for successfully loading, FALSE otherwise
+************************/
+BOOL removeNode(List *pList, Node *delNode){
+	BOOL success = FALSE;
+	Node *pAfter = NULL;
+	Node *pBefore = NULL;
+
+	while(delNode != NULL){
+		if (pList->size == 1) { // only node
+			pList->pHead = NULL;
+		}
+		else if (delNode->pPrev == NULL) { // first node
+			pAfter = delNode->pNext;
+			pAfter->pPrev = NULL;
+			pList->pHead = pAfter;
+			delNode->pNext = NULL;
+		}
+		else if (delNode->pNext == NULL) { // last node
+			pBefore = delNode->pPrev;
+			pBefore->pNext = NULL;
+			pList->pTail = pBefore;
+			delNode->pPrev = NULL;
+		}
+		else  { // middle node
+			pBefore = delNode->pPrev;
+			pAfter = delNode->pNext;
+			pBefore->pNext = pAfter;
+			pAfter->pPrev = pBefore;
+			delNode->pNext = NULL;
+			delNode->pPrev = NULL;
+		}
+
+
+		// free the memory!!
+		free(delNode->data->albumTitle);
+		free(delNode->data->artist);
+		free(delNode->data->genre);
+		free(delNode->data->songLength);
+		free(delNode->data->songTitle);
+		free(delNode->data);
+		free(delNode);
+		delNode = NULL;
+		pList->size--;
+		success = TRUE;
+	}
+
+	return success;
+}
+
+/***********************
 Function:	resetSubList
 input:		sublist
 output:		none
 ************************/
 void resetSubList(List *sList) {
-	
 	Node *listHead = sList->pHead;
 	Node *temp;
 
@@ -493,7 +543,7 @@ void printList(List *list) {
 }
 
 /***********************
-Function:	printList
+Function:	printSongs
 input:		pList to be printed
 output:		(none)
 ************************/
@@ -507,7 +557,6 @@ void printSongs(List *list) {
 	}
 }
 
-
 /***********************
 Function:	printMenu
 input:		(none)
@@ -518,13 +567,13 @@ void printMenu() {
 	printf("(2) store\n");
 	printf("(3) display\n");
 	printf("(4) insert (not implemented)\n");
-	printf("(5) delete (not implemented)\n");
+	printf("(5) delete\n");
 	printf("(6) edit\n");
 	printf("(7) sort (not implemented)\n");
 	printf("(8) rate\n");
 	printf("(9) play\n");
 	printf("(10) shuffle (not implemented)\n");
-	printf("(11) exit\n");
+	printf("(11/\"exit\") exit\n");
 }
 
 /***********************
@@ -548,8 +597,7 @@ void clrscr() {
 }
 
 // gets input in a smart way
-char *getInput(char *in)
-{
+char *getInput(char *in) {
 	fgets(in, 50, stdin);
 	if (in[strlen(in) - 1] == '\n')
 		in[strlen(in) - 1] = '\0';
