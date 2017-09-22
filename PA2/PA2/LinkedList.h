@@ -42,6 +42,7 @@ BOOL del(List *pList);
 BOOL edit(List *list);
 BOOL rate(List *pList);
 BOOL play(List *list);
+void shuffle(List *pList);
 int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
 Node *getSong(List *pList, char *song);

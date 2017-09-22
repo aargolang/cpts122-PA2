@@ -172,11 +172,13 @@ void insert(List *pList) {
 	
 	printf("how many minutes long is the song?: ");
 	getInput(userInput);
-	rMem->songLength->minutes = atoi(userInput);
+	dMem->minutes = atoi(userInput);
 	
 	printf("...and how many seconds long is the song?: ");
 	getInput(userInput);
-	rMem->songLength->seconds = atoi(userInput);
+	dMem->seconds = atoi(userInput);
+
+	rMem->songLength = dMem;
 
 	printf("how many 'times played' do you wish to specify?: ");
 	getInput(userInput);
@@ -424,6 +426,43 @@ BOOL play(List *pList) {
 		}
 	}
 	return success;
+}
+
+/***********************
+Function:	shuffle
+input:		list
+output:		plays songs in random order
+************************/
+void shuffle(List *pList) {
+	char userInput[50] = { '\0' };
+	int songsPlayed = 0, ran = 0, position = 0, *check = NULL;
+	Node *pCur = NULL;
+	
+	if(pList->pHead != NULL){
+		pCur = pList->pHead;
+		check = malloc((pList->size) * sizeof(int));
+		while (songsPlayed != pList->size) {		
+			ran = ((rand() % pList->size) + 1);
+			if (check[ran] != 1) {
+				printf("rand # is : %i\n", ran);
+				// play this index of song
+				if (position < ran) {
+					// move position and pcur backwards in list
+				}
+				else if (position < ran) {
+					// move position and pcur forwards in list
+				}
+				else {
+					// play song
+				}
+
+				
+				check[ran] = 1;
+				songsPlayed++;
+			}
+		}
+	}
+	getInput(userInput);
 }
 
 /***********************

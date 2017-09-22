@@ -103,7 +103,9 @@ int main()
 			clrscr();
 			break;
 		case 10:
-			printf("(10) shuffle (not implemented)\n");
+			clrscr();
+			shuffle(&songList);
+			clrscr();
 			break;
 		case 11:
 			store(&songList);
