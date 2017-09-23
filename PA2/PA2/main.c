@@ -17,6 +17,7 @@ Files:			- main.c
 #include <stdio.h>
 #include <Windows.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
 int main()
@@ -24,14 +25,14 @@ int main()
 	BOOL success = FALSE;
 	List songList;
 	songList.pHead = NULL;
-	songList.pTail = NULL;
+	songList.pTail = NULL; 
 	songList.size = 0;
 	int exit = 0;
 	char userInput[51] = { '0' };
 	char message[51] = { '\0' };
+	srand(time(NULL));
 
-	while (exit != 1)
-	{
+	while (exit != 1){
 		printf("MESSAGE: %s\n", message);
 		printf("list size: %i\n", songList.size);
 		printMenu();
@@ -91,7 +92,9 @@ int main()
 			clrscr();
 			break;
 		case 7:
-			printf("(7) sort (not implemented)\n");
+			clrscr();
+			sort(&songList);
+			clrscr();
 			break;
 		case 8:
 			clrscr();

@@ -201,10 +201,10 @@ BOOL del(List *pList) {
 	BOOL exit = FALSE;
 	char userInput[50] = { '\0' };
 	Node *pCur = NULL;
-	printSongs(pList);
 
 	if (pList->size > 0) {
 		while (exit == FALSE){
+			printSongs(pList);
 			printf("Which song would you like to delete? (\"exit\" to leave): ");
 			getInput(userInput);
 
@@ -212,6 +212,7 @@ BOOL del(List *pList) {
 
 			if (pCur != NULL) {
 				removeNode(pList, pCur);
+				clrscr();
 				// remove node
 			}
 			else if (strcmp(userInput, "exit") == 0) {
@@ -428,6 +429,93 @@ BOOL play(List *pList) {
 	return success;
 }
 
+BOOL sort(List *pList) {
+	BOOL exit = FALSE, success = FALSE;
+	int length = pList->size, sorted = 0, type = 0;
+	char userInput[50] = { '\0' };
+	Node *i = NULL, *max = NULL;
+	List sortedList;
+	Record *rMem = NULL;
+	sortedList.pHead = NULL;
+	sortedList.pTail = NULL;
+	sortedList.size = 0;
+	while(exit == FALSE){
+		clrscr();
+		printSongs(pList);
+		printf("what would you like to sort the list by?\n");
+		printf("(1) artist\n");
+		printf("(2) album\n");
+		printf("(3) rating\n");
+		printf("(4) times played\n");
+
+		type = atoi(getInput(userInput));
+		if ((type > 0) && (type < 5)) {
+			while (sorted != length) {
+				i = pList->pHead;
+				max = pList->pHead;
+				while (i != NULL) {
+					if (nodecmp(max, i, type) < 0) {// get the local max
+						max = i;
+					}
+					i = i->pNext;
+				}
+				// get the pointer to the record and pass it into insert front for the new list
+				popNode(pList, max);
+				pList->size--;
+				rMem = max->data;
+				free(max);
+				insertFront(&sortedList, rMem);
+				sorted++;
+			}
+
+			pList->pHead = sortedList.pHead;
+			pList->pTail = sortedList.pTail;
+			pList->size = sortedList.size;
+			sortedList.pHead = NULL;
+			sortedList.pTail = NULL;
+			sortedList.size = 0;
+			success = TRUE;
+			sorted = 0;
+		}
+		else if (strcmp(userInput, "exit") == 0) {
+			return success;
+		}
+		else {
+			printf("input not recognized, try again");
+		}
+	}
+	return success;
+}
+
+int nodecmp(Node *n1, Node *n2, int type) {
+	/*
+	type = 1 :: artist
+	type = 2 :: album
+	type = 3 :: rating
+	type = 4 :: times played
+	*/
+	int compare = 0;
+	if (type == 1) {
+		compare = strcmp(n1->data->artist, n2->data->artist);
+	}
+	else if (type == 2) {
+		compare = strcmp(n1->data->albumTitle, n2->data->albumTitle);
+	}
+	else if (type == 3) {
+		compare = n1->data->rating - n2->data->rating;
+	}
+	else {
+		compare = n1->data->timesPlayed - n2->data->timesPlayed;
+	}
+
+	if (compare > 0)
+		return 1;
+	else if (compare < 0)
+		return -1;
+	else
+		return 0;
+}
+
 /***********************
 Function:	shuffle
 input:		list
@@ -437,32 +525,40 @@ void shuffle(List *pList) {
 	char userInput[50] = { '\0' };
 	int songsPlayed = 0, ran = 0, position = 0, *check = NULL;
 	Node *pCur = NULL;
+	BOOL played = FALSE;
+	time_t t;
 	
 	if(pList->pHead != NULL){
 		pCur = pList->pHead;
 		check = malloc((pList->size) * sizeof(int));
-		while (songsPlayed != pList->size) {		
-			ran = ((rand() % pList->size) + 1);
+		while (songsPlayed != (pList->size)) {		
+			ran = ((rand() % pList->size));
 			if (check[ran] != 1) {
-				printf("rand # is : %i\n", ran);
-				// play this index of song
-				if (position < ran) {
-					// move position and pcur backwards in list
-				}
-				else if (position < ran) {
-					// move position and pcur forwards in list
-				}
-				else {
-					// play song
-				}
-
-				
 				check[ran] = 1;
-				songsPlayed++;
+				played = FALSE;
+				while(played == FALSE){
+					if (position > ran) {
+						// move position and pcur backwards in list
+						pCur = pCur->pPrev;
+						position--;
+					}
+					else if (position < ran) {
+						// move position and pcur forwards in list
+						pCur = pCur->pNext;
+						position++;
+					}
+					else {
+						printf("playing song: %s\n", pCur->data->songTitle);
+						Sleep(1000);
+						pCur->data->timesPlayed++;
+						// play song
+						songsPlayed++;
+						played = TRUE;
+					}
+				}
 			}
 		}
 	}
-	getInput(userInput);
 }
 
 /***********************
@@ -544,49 +640,83 @@ Function:	removeNode
 input:		remove node from list
 output:		TRUE for successfully loading, FALSE otherwise
 ************************/
-BOOL removeNode(List *pList, Node *delNode){
+BOOL removeNode(List *pList, Node *remNode){
 	BOOL success = FALSE;
 	Node *pAfter = NULL;
 	Node *pBefore = NULL;
 
-	while(delNode != NULL){
+	while(remNode != NULL){
 		if (pList->size == 1) { // only node
 			pList->pHead = NULL;
 		}
-		else if (delNode->pPrev == NULL) { // first node
-			pAfter = delNode->pNext;
+		else if (remNode->pPrev == NULL) { // first node
+			pAfter = remNode->pNext;
 			pAfter->pPrev = NULL;
 			pList->pHead = pAfter;
-			delNode->pNext = NULL;
+			remNode->pNext = NULL;
 		}
-		else if (delNode->pNext == NULL) { // last node
-			pBefore = delNode->pPrev;
+		else if (remNode->pNext == NULL) { // last node
+			pBefore = remNode->pPrev;
 			pBefore->pNext = NULL;
 			pList->pTail = pBefore;
-			delNode->pPrev = NULL;
+			remNode->pPrev = NULL;
 		}
 		else  { // middle node
-			pBefore = delNode->pPrev;
-			pAfter = delNode->pNext;
+			pBefore = remNode->pPrev;
+			pAfter = remNode->pNext;
 			pBefore->pNext = pAfter;
 			pAfter->pPrev = pBefore;
-			delNode->pNext = NULL;
-			delNode->pPrev = NULL;
+			remNode->pNext = NULL;
+			remNode->pPrev = NULL;
 		}
 
-
 		// free the memory!!
-		free(delNode->data->albumTitle);
-		free(delNode->data->artist);
-		free(delNode->data->genre);
-		free(delNode->data->songLength);
-		free(delNode->data->songTitle);
-		free(delNode->data);
-		free(delNode);
-		delNode = NULL;
+
+		free(remNode->data->albumTitle);
+		free(remNode->data->artist);
+		free(remNode->data->genre);
+		free(remNode->data->songLength);
+		free(remNode->data->songTitle);
+		free(remNode->data);
+		free(remNode);
+		remNode = NULL;
 		pList->size--;
+
 		success = TRUE;
 	}
+
+	return success;
+}
+
+BOOL popNode(List *pList, Node *remNode) {
+	BOOL success = FALSE;
+	Node *pAfter = NULL;
+	Node *pBefore = NULL;
+
+	if (pList->size == 1) { // only node
+		pList->pHead = NULL;
+	}
+	else if (remNode->pPrev == NULL) { // first node
+		pAfter = remNode->pNext;
+		pAfter->pPrev = NULL;
+		pList->pHead = pAfter;
+		remNode->pNext = NULL;
+	}
+	else if (remNode->pNext == NULL) { // last node
+		pBefore = remNode->pPrev;
+		pBefore->pNext = NULL;
+		pList->pTail = pBefore;
+		remNode->pPrev = NULL;
+	}
+	else { // middle node
+		pBefore = remNode->pPrev;
+		pAfter = remNode->pNext;
+		pBefore->pNext = pAfter;
+		pAfter->pPrev = pBefore;
+		remNode->pNext = NULL;
+		remNode->pPrev = NULL;
+	}
+	success = TRUE;
 
 	return success;
 }
@@ -621,7 +751,7 @@ output:		(none)
 void printList(List *list) {
 	Node *pCur = (list)->pHead;
 	while (pCur != NULL) {
-		printf("\nArtist: \t%s\n", pCur->data->artist);
+		printf("Artist: \t%s\n", pCur->data->artist);
 		printf("Album: \t\t%s\n", pCur->data->albumTitle);
 		printf("Title: \t\t%s\n", pCur->data->songTitle);
 		printf("Genre: \t\t%s\n", pCur->data->genre);
@@ -642,7 +772,7 @@ void printSongs(List *list) {
 	int i = 1;
 	Node *pCur = (list)->pHead;
 	while (pCur != NULL) {
-		printf("%i: %s - %s\n", i, pCur->data->artist, pCur->data->songTitle);
+		printf("%i: %s - %s : %s (rating) %i (times played) %i\n", i, pCur->data->artist, pCur->data->songTitle, pCur->data->albumTitle, pCur->data->rating , pCur->data->timesPlayed);
 		pCur = pCur->pNext;
 		i++;
 	}
@@ -657,13 +787,13 @@ void printMenu() {
 	printf("(1) load\n");
 	printf("(2) store\n");
 	printf("(3) display\n");
-	printf("(4) insert (not implemented)\n");
+	printf("(4) insert\n");
 	printf("(5) delete\n");
 	printf("(6) edit\n");
-	printf("(7) sort (not implemented)\n");
+	printf("(7) sort\n");
 	printf("(8) rate\n");
 	printf("(9) play\n");
-	printf("(10) shuffle (not implemented)\n");
+	printf("(10) shuffle\n");
 	printf("(11/\"exit\") exit\n");
 }
 

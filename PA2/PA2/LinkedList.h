@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <windows.h>
 
 typedef struct duration{
@@ -47,7 +48,7 @@ int getArtist(List *pList, List *sList, char *artist);
 Record *getRecord(List *sList, char *song);
 Node *getSong(List *pList, char *song);
 void freeList(List *pList);
-BOOL removeNode(List *pList, Node *delNode);
+BOOL removeNode(List *pList, Node *remNode);
 void resetSubList(List *sList);
 void printList(List *list);
 void printSongs(List *list);
