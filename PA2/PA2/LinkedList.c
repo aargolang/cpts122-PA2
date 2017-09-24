@@ -1,10 +1,6 @@
 #include "LinkedList.h"
 
-/***********************
-Function:	makeNode
-input:		record
-output:		pointer to new node with record
-************************/
+// create node with record data
 Node *makenode(Record *dat){
 	Node *pNode = (Node*)malloc(sizeof(Node));
 	pNode->pNext = NULL;
@@ -14,26 +10,20 @@ Node *makenode(Record *dat){
 	return pNode;
 }
 
-/***********************
-Function:		insertFront
-input:			pList and node to insert
-output:			TRUE for successfully allocating space for a node; FALSE otherwise
-description:	insert node at the (!!!)FRONT(!!!) of the list
-************************/
+// inserts node at the front made with the data passed in
 BOOL insertFront(List *pList, Record *dat) {
 	BOOL success = FALSE;
 	Node *pMem = NULL;
 	Node *pTemp = NULL;
 	pMem = makenode(dat);
 
-	if ((pList->pHead == NULL) && (pMem != NULL)){ 
-		// list is empty
+	if ((pList->pHead == NULL) && (pMem != NULL)){	// if list is empty
 		pList->pHead = pMem;
 		pList->pTail = pMem;
 		pList->size++;
 		success = TRUE;
 	}
-	else { // if the list is not empty
+	else {											// if the list is not empty
 		pTemp = pList->pHead;
 		pMem->pNext = pTemp;
 		pTemp->pPrev = pMem;
@@ -45,11 +35,7 @@ BOOL insertFront(List *pList, Record *dat) {
 	return success;
 }
 
-/***********************
-Function:	store
-input:
-output:		TRUE if file opened for w+, FALSE if otherwise
-************************/
+// stores the list data into csv file
 BOOL store(List *pList) {
 	BOOL success = FALSE;
  	FILE *filepointer = fopen("temp.csv", "w+");
@@ -78,11 +64,7 @@ BOOL store(List *pList) {
 	return success;
 }
 
-/***********************
-Function:	load
-input:		read from file into list
-output:		TRUE for successfully loading, FALSE otherwise
-************************/
+// loads/reloads information from csv file
 BOOL load(List *pList) {
 	BOOL success = 0;
 	int index = 1;
@@ -137,11 +119,7 @@ BOOL load(List *pList) {
 	return success;
 }
 
-/***********************
-Function:	insert
-input:		list
-output:		(none)
-************************/
+// inserts new node with data designated by user
 void insert(List *pList) {
 	Record *rMem = NULL;
 	Duration *dMem = NULL;
@@ -191,11 +169,7 @@ void insert(List *pList) {
 	insertFront(pList, rMem);
 }
 
-/***********************
-Function:	del
-input:		delete node with specefied songname
-output:		TRUE for successfully deleting, FALSE otherwise
-************************/
+// delete by name of song
 BOOL del(List *pList) {
 	BOOL success = FALSE;
 	BOOL exit = FALSE;
@@ -226,11 +200,7 @@ BOOL del(List *pList) {
 	return success;
 }
 
-/***********************
-Function:	edit
-input:		changes values in the records
-output:		TRUE if successful, FALSE if otherwise
-************************/
+// edit any values in any record
 BOOL edit(List *list) {
 	List subList;
 	subList.pHead = NULL;
@@ -243,7 +213,7 @@ BOOL edit(List *list) {
 	int songCount = 0;
 
 	while (escape == FALSE) {
-		resetSubList(&subList);
+		freeList(subList);
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
 
@@ -293,7 +263,6 @@ BOOL edit(List *list) {
 
 			printEditMenu();
 			printf("choose the attribute to change? (\"exit\" when finished): ");
-			// canf_s("%s", userInput, 50);
 			getInput(userInput);
 			switch (atoi(userInput)) {
 			case 1:
@@ -355,11 +324,7 @@ BOOL edit(List *list) {
 	return edited;
 }
 
-/***********************
-Function:	rate
-input:		pList
-output:		TRUE if successful, FALSE if otherwise
-************************/
+// changes the rating of a song
 BOOL rate(List *pList){
 	BOOL success = FALSE;
 	BOOL exit = FALSE;
@@ -378,6 +343,7 @@ BOOL rate(List *pList){
 				printf("\nHow many stars do you wish to rate it?: ");
 				getInput(userInput);
 				atoiInput = atoi(userInput);
+				// restrict rating from 1 to 5
 				if ((atoiInput > 0) && (atoiInput < 6)){
 					rMem->rating = atoiInput;
 					success = TRUE;
@@ -396,11 +362,7 @@ BOOL rate(List *pList){
 	return success;
 }
 
-/***********************
-Function:	play
-input:		pList
-output:		TRUE if successful, FALSE if otherwise
-************************/
+// play playlist from the song selected
 BOOL play(List *pList) {
 	BOOL success = FALSE;
 	BOOL exit = FALSE;
@@ -429,6 +391,7 @@ BOOL play(List *pList) {
 	return success;
 }
 
+// sorts the list in a pseudo insertion sort 
 BOOL sort(List *pList) {
 	BOOL exit = FALSE, success = FALSE;
 	int length = pList->size, sorted = 0, type = 0;
@@ -439,6 +402,8 @@ BOOL sort(List *pList) {
 	sortedList.pHead = NULL;
 	sortedList.pTail = NULL;
 	sortedList.size = 0;
+
+	// select type of data to sort by
 	while(exit == FALSE){
 		clrscr();
 		printSongs(pList);
@@ -449,17 +414,21 @@ BOOL sort(List *pList) {
 		printf("(4) times played\n");
 
 		type = atoi(getInput(userInput));
+		
+		// restrict type to 1 - 4
 		if ((type > 0) && (type < 5)) {
 			while (sorted != length) {
 				i = pList->pHead;
 				max = pList->pHead;
-				while (i != NULL) {
-					if (nodecmp(max, i, type) < 0) {// get the local max
+				// get the max of the pList
+				while (i != NULL) {				
+					if (nodecmp(max, i, type) < 0) {
 						max = i;
 					}
 					i = i->pNext;
 				}
-				// get the pointer to the record and pass it into insert front for the new list
+				
+				// insert max->data into front of sorted list
 				popNode(pList, max);
 				pList->size--;
 				rMem = max->data;
@@ -468,6 +437,7 @@ BOOL sort(List *pList) {
 				sorted++;
 			}
 
+			// point pList head to new sorted list pHead (sorry this is hacky)
 			pList->pHead = sortedList.pHead;
 			pList->pTail = sortedList.pTail;
 			pList->size = sortedList.size;
@@ -487,6 +457,7 @@ BOOL sort(List *pList) {
 	return success;
 }
 
+// compares two nodes by the specified type 
 int nodecmp(Node *n1, Node *n2, int type) {
 	/*
 	type = 1 :: artist
@@ -516,11 +487,7 @@ int nodecmp(Node *n1, Node *n2, int type) {
 		return 0;
 }
 
-/***********************
-Function:	shuffle
-input:		list
-output:		plays songs in random order
-************************/
+// plays the songs of the list in random order
 void shuffle(List *pList) {
 	char userInput[50] = { '\0' };
 	int songsPlayed = 0, ran = 0, position = 0, *check = NULL;
@@ -528,6 +495,8 @@ void shuffle(List *pList) {
 	BOOL played = FALSE;
 	time_t t;
 	
+	// gets random number and checks it against indicator array
+	// this way wastes cycles if there are collisions 
 	if(pList->pHead != NULL){
 		pCur = pList->pHead;
 		check = malloc((pList->size) * sizeof(int));
@@ -561,11 +530,7 @@ void shuffle(List *pList) {
 	}
 }
 
-/***********************
-Function:	getArtist
-input:		list, subList, artists name
-output:		number of songs found by the artist
-************************/
+// returns a sublist of songs by the *artist 
 int getArtist(List *pList, List *sList, char *artist) {
 	int count = 0;
 	Node *listHead = pList->pHead;
@@ -582,18 +547,12 @@ int getArtist(List *pList, List *sList, char *artist) {
 	return count;
 }
 
-/***********************
-Function:	getRecord
-input:		sublist, songname
-output:		pointer to the record to be changed, NULL if search failed
-************************/
+// return the pointer to the record of the name *song
 Record *getRecord(List *sList, char *song) {
 	Record *rec = NULL;
 	Node *subListHead = sList->pHead;
 
 	while (subListHead != NULL) {
-		// return the pointer to the record of the name "*song"
-		// printf("songTitle: %s\nsong: %s\n", subListHead->data->songTitle, song);
 		if (strncmp(subListHead->data->songTitle, song, 50) == 0) {
 			rec = subListHead->data;
 		}
@@ -602,16 +561,11 @@ Record *getRecord(List *sList, char *song) {
 	return rec;
 }
 
-/***********************
-Function:	getSong
-input:		list, song name
-output:		pointer to the node containing the song
-************************/
+// get the pointer to the node for the song by the name *song
 Node *getSong(List *pList, char *song) {
 	Node *listHead = pList->pHead;
 
 	while (listHead != NULL) {
-		// if the song is found then return the pointer to that Node
 		if (strcmp(listHead->data->songTitle, song) == 0) {
 			return listHead;
 		}
@@ -620,11 +574,7 @@ Node *getSong(List *pList, char *song) {
 	return NULL;
 }
 
-/***********************
-Function:	freeList
-input:		list
-output:		(none)
-************************/
+// deletes all nodes into list and frees all memory
 void freeList(List *pList) {
 	BOOL removed = TRUE;
 	Node *pCur = NULL;
@@ -635,11 +585,7 @@ void freeList(List *pList) {
 	}
 }
 
-/***********************
-Function:	removeNode
-input:		remove node from list
-output:		TRUE for successfully loading, FALSE otherwise
-************************/
+// removes the node passed in
 BOOL removeNode(List *pList, Node *remNode){
 	BOOL success = FALSE;
 	Node *pAfter = NULL;
@@ -688,6 +634,7 @@ BOOL removeNode(List *pList, Node *remNode){
 	return success;
 }
 
+// removes the node passed in without freeing or deleting
 BOOL popNode(List *pList, Node *remNode) {
 	BOOL success = FALSE;
 	Node *pAfter = NULL;
@@ -721,11 +668,7 @@ BOOL popNode(List *pList, Node *remNode) {
 	return success;
 }
 
-/***********************
-Function:	resetSubList
-input:		sublist
-output:		none
-************************/
+// 
 void resetSubList(List *sList) {
 	Node *listHead = sList->pHead;
 	Node *temp;
