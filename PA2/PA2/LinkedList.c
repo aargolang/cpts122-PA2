@@ -38,7 +38,7 @@ BOOL insertFront(List *pList, Record *dat) {
 // stores the list data into csv file
 BOOL store(List *pList) {
 	BOOL success = FALSE;
- 	FILE *filepointer = fopen("temp.csv", "w+");
+ 	FILE *filepointer = fopen("musicPlayList.csv", "w+");
 	Node *pCur = pList->pTail;
 	char nameBuff[25];
 	int index = 0;
@@ -120,53 +120,59 @@ BOOL load(List *pList) {
 }
 
 // inserts new node with data designated by user
-void insert(List *pList) {
+BOOL insert(List *pList) {
 	Record *rMem = NULL;
 	Duration *dMem = NULL;
 	BOOL done = FALSE;
+	BOOL success = FALSE;
 	char userInput[50] = { '\0' };
 
+	// there is a lot of malloc() going on here and I am onlty going to check for making room for the record and duration
 	rMem = (Record*)malloc(sizeof(Record));
 	dMem = (Duration*)malloc(sizeof(Duration));
-	printf("what is the artist's name?: ");
-	getInput(userInput);
-	rMem->artist = (char*)malloc(strlen(userInput) + 1);
-	strcpy(rMem->artist, userInput);
+	while (rMem != NULL && dMem != NULL){
+		printf("what is the artist's name?: ");
+		getInput(userInput);
+		rMem->artist = (char*)malloc(strlen(userInput) + 1);
+		strcpy(rMem->artist, userInput);
 	
-	printf("what is the album title?: ");
-	getInput(userInput);
-	rMem->albumTitle = (char*)malloc(strlen(userInput) + 1);
-	strcpy(rMem->albumTitle, userInput);
+		printf("what is the album title?: ");
+		getInput(userInput);
+		rMem->albumTitle = (char*)malloc(strlen(userInput) + 1);
+		strcpy(rMem->albumTitle, userInput);
 	
-	printf("what is the song title?: ");
-	getInput(userInput);
-	rMem->songTitle = (char*)malloc(strlen(userInput) + 1);
-	strcpy(rMem->songTitle, userInput);
+		printf("what is the song title?: ");
+		getInput(userInput);
+		rMem->songTitle = (char*)malloc(strlen(userInput) + 1);
+		strcpy(rMem->songTitle, userInput);
 	
-	printf("what is the genre you wish to specify?: ");
-	getInput(userInput);
-	rMem->genre = (char*)malloc(strlen(userInput) + 1);
-	strcpy(rMem->genre, userInput);
+		printf("what is the genre you wish to specify?: ");
+		getInput(userInput);
+		rMem->genre = (char*)malloc(strlen(userInput) + 1);
+		strcpy(rMem->genre, userInput);
 	
-	printf("how many minutes long is the song?: ");
-	getInput(userInput);
-	dMem->minutes = atoi(userInput);
+		printf("how many minutes long is the song?: ");
+		getInput(userInput);
+		dMem->minutes = atoi(userInput);
 	
-	printf("...and how many seconds long is the song?: ");
-	getInput(userInput);
-	dMem->seconds = atoi(userInput);
+		printf("...and how many seconds long is the song?: ");
+		getInput(userInput);
+		dMem->seconds = atoi(userInput);
 
-	rMem->songLength = dMem;
+		rMem->songLength = dMem;
 
-	printf("how many 'times played' do you wish to specify?: ");
-	getInput(userInput);
-	rMem->timesPlayed = atoi(userInput);
+		printf("how many 'times played' do you wish to specify?: ");
+		getInput(userInput);
+		rMem->timesPlayed = atoi(userInput);
 
-	printf("what do you rate the song?: ");
-	getInput(userInput);
-	rMem->rating = atoi(userInput);
+		printf("what do you rate the song?: ");
+		getInput(userInput);
+		rMem->rating = atoi(userInput);
 
-	insertFront(pList, rMem);
+		insertFront(pList, rMem);
+		success = TRUE;
+	}
+	return success;
 }
 
 // delete by name of song
@@ -185,7 +191,7 @@ BOOL del(List *pList) {
 			pCur = getSong(pList, userInput);
 
 			if (pCur != NULL) {
-				removeNode(pList, pCur);
+				success = removeNode(pList, pCur);
 				clrscr();
 				// remove node
 			}
@@ -213,7 +219,7 @@ BOOL edit(List *list) {
 	int songCount = 0;
 
 	while (escape == FALSE) {
-		freeList(subList);
+		resetSubList(&subList);
 		// user chooses artist and song to change
 		while (recordToChange == NULL) {
 
@@ -269,18 +275,21 @@ BOOL edit(List *list) {
 				printf("what would you like to change Artist to?: ");
 				getInput(userInput);
 				strcpy(recordToChange->artist, userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			case 2:
 				printf("What would you like to change Album title to?: ");
 				getInput(userInput);
 				strcpy(recordToChange->albumTitle, userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			case 3:
 				printf("What would you like to change Song title to?: ");
 				getInput(userInput);
 				strcpy(recordToChange->songTitle, userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			case 4:
@@ -296,18 +305,21 @@ BOOL edit(List *list) {
 				printf("what would youl like seconds changed to?");
 				getInput(userInput);
 				recordToChange->songLength->seconds = atoi(userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			case 6:
 				printf("what would youl like times played changed to?: ");
 				getInput(userInput);
 				recordToChange->timesPlayed = atoi(userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			case 7:
 				printf("what would youl like rating changed to?: ");
 				getInput(userInput);
 				recordToChange->rating = atoi(userInput);
+				edited = TRUE;
 				clrscr();
 				break;
 			default:
@@ -668,13 +680,12 @@ BOOL popNode(List *pList, Node *remNode) {
 	return success;
 }
 
-// 
+// frees nodes but leaves records intact
 void resetSubList(List *sList) {
 	Node *listHead = sList->pHead;
 	Node *temp;
 
 	while (sList->pHead != NULL) {
-		// free all of the nodes in the sublist, not supposed to free record data
 		sList->pHead->data = NULL;
 		sList->pHead->pPrev = NULL;
 		temp = sList->pHead;
@@ -686,11 +697,7 @@ void resetSubList(List *sList) {
 	sList->pTail = NULL;
 }
 
-/***********************
-Function:	printList
-input:		pList to be printed
-output:		(none)
-************************/
+// detailed data on the entire list
 void printList(List *list) {
 	Node *pCur = (list)->pHead;
 	while (pCur != NULL) {
@@ -706,11 +713,7 @@ void printList(List *list) {
 	}
 }
 
-/***********************
-Function:	printSongs
-input:		pList to be printed
-output:		(none)
-************************/
+// just the song data
 void printSongs(List *list) {
 	int i = 1;
 	Node *pCur = (list)->pHead;
@@ -721,11 +724,7 @@ void printSongs(List *list) {
 	}
 }
 
-/***********************
-Function:	printMenu
-input:		(none)
-output:		(none)
-************************/
+// main menu
 void printMenu() {
 	printf("(1) load\n");
 	printf("(2) store\n");
@@ -740,11 +739,7 @@ void printMenu() {
 	printf("(11/\"exit\") exit\n");
 }
 
-/***********************
-Function:	printEditMenu
-input:		(none)
-output:		(none)
-************************/
+// edit menu
 void printEditMenu() {
 	printf("(1) Artist\n");
 	printf("(2) Album title\n");
@@ -755,12 +750,12 @@ void printEditMenu() {
 	printf("(7) rating\n");
 }
 
-// clears the screen. nuff said.
+// I got tired of typing this after the second time. sue me
 void clrscr() {
 	system("@cls||clear");
 }
 
-// gets input in a smart way
+// just keeping my inputs air tight. maybe this isn't necessary
 char *getInput(char *in) {
 	fgets(in, 50, stdin);
 	if (in[strlen(in) - 1] == '\n')

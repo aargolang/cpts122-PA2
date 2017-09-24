@@ -1,7 +1,7 @@
 /********************************
 Name:			Arthur Lang
-Assignment:		PA2 - Digital Music Manager
-Date Started:	9/11/17
+Assignment:		PA3 - Digital Music Manager part 2
+Date Started:	9/18/17
 
 Description:	create and implement a imitation digital music manager
 				to showcase the functionality of a doubly linked list
@@ -19,29 +19,30 @@ Files:			- main.c
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 int main()
 {
 	BOOL success = FALSE;
+	BOOL edited = FALSE;
+	BOOL exit = FALSE;
 	List songList;
 	songList.pHead = NULL;
 	songList.pTail = NULL; 
 	songList.size = 0;
-	int exit = 0;
-	char userInput[51] = { '0' };
-	char message[51] = { '\0' };
+	char userInput[50] = { '0' };
+	char message[50] = { '\0' };
 	srand(time(NULL));
 
-	while (exit != 1){
+	while (exit == FALSE){
+		success = FALSE;
 		printf("MESSAGE: %s\n", message);
 		printf("list size: %i\n", songList.size);
 		printMenu();
 		getInput(userInput);
+		// if user likes to type "exit" rather than 11
 		if (strcmp(userInput, "exit") == 0) {
-			exit = 1;
-		}
-		else if (strcmp(userInput, "free") == 0) {
-			freeList(&songList);
+			exit = TRUE;
 		}
 		switch (atoi(userInput)) {
 		case 1:
@@ -57,8 +58,10 @@ int main()
 		case 2:
 			clrscr();
 			success = store(&songList);
-			if (success = TRUE)
+			if (success = TRUE){
 				strncpy(message, "successfully written to file", 50);
+				edited = FALSE;
+			}
 			else
 				strncpy(message, "failed to open file to write+", 50);
 			clrscr();
@@ -74,19 +77,32 @@ int main()
 		case 4:
 			clrscr();
 			insert(&songList);
-			strncpy(message, "song inserted", 50);
+			if (success = TRUE) {
+				strncpy(message, "changes made to list", 50);
+				edited = TRUE;
+			}
+			else
+				strncpy(message, "no changes made", 50);
 			clrscr();
 			break;
 		case 5:
 			clrscr();
-			del(&songList);
+			success = del(&songList);
+			if (success = TRUE) {
+				strncpy(message, "changes made to list", 50);
+				edited = TRUE;
+			}
+			else
+				strncpy(message, "no changes made", 50);
 			clrscr();
 			break;
 		case 6:
 			clrscr();
 			success = edit(&songList);
-			if (success = TRUE)
+			if (success = TRUE){
 				strncpy(message, "changes made to list", 50);
+				edited = TRUE;
+			}
 			else
 				strncpy(message, "no changes made", 50);
 			clrscr();
@@ -94,11 +110,23 @@ int main()
 		case 7:
 			clrscr();
 			sort(&songList);
+			if (success = TRUE) {
+				strncpy(message, "changes made to list", 50);
+				edited = TRUE;
+			}
+			else
+				strncpy(message, "no changes made", 50);
 			clrscr();
 			break;
 		case 8:
 			clrscr();
 			rate(&songList);
+			if (success = TRUE) {
+				strncpy(message, "changes made to list", 50);
+				edited = TRUE;
+			}
+			else
+				strncpy(message, "no changes made", 50);
 			clrscr();
 			break;
 		case 9:
@@ -111,13 +139,26 @@ int main()
 			clrscr();
 			break;
 		case 11:
-			store(&songList);
+			while(exit == FALSE && edited == TRUE){
+				printf("Your changes have not been saved. Would you like to save? (yes/no): ");
+				getInput(userInput);
+				if (strcmp(userInput, "yes") == 0) {
+					store(&songList);
+					exit = TRUE;
+				}
+				else if (strcmp(userInput, "no") == 0) {
+					exit = TRUE;
+				}
+				else {
+					printf("\n");
+				}
+			}
+			exit == TRUE;
 			freeList(&songList);
-			exit = 1;
 			break;
 		default:
-			printf("input not recognized :(\ntry again\n");
-			strncpy(message, "\0", 2);
+			strncpy(message, "input not recognized", 50);
+			clrscr();
 		}
 	}
 	return 0;

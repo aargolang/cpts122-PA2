@@ -38,7 +38,7 @@ Node *makenode(Record *dat);
 BOOL insertFront(List *pList, Record *dat);
 BOOL store(List *pList);
 BOOL load(List *list);
-void insert(List *pList);
+BOOL insert(List *pList);
 BOOL del(List *pList);
 BOOL edit(List *list);
 BOOL rate(List *pList);
