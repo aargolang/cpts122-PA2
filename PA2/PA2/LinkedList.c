@@ -171,6 +171,7 @@ BOOL insert(List *pList) {
 
 		insertFront(pList, rMem);
 		success = TRUE;
+		rMem = NULL;
 	}
 	return success;
 }
